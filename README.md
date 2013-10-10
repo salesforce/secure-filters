@@ -113,13 +113,26 @@ XSS accidents!  Consider the template:
   <img src='<%= prefs.avatar %>'>
 ```
 
-When given user input `x' onerror='alert(1)`, this gets rendered as:
+When given user input `x' onerror='alert(1)`, the above gets rendered as:
 
 ```html
   <img src='x' onerror='alert(1)'>
 ```
 
-Which will cause the `onerror` javascript to run.
+Which will cause the `onerror` javascript to run.  Using this module's filter should prevent this.
+
+```html
+  <img src='<%-: prefs.avatar |html%>'>
+```
+
+When given user input `x' onerror='alert(1)`, the above gets rendered as:
+
+```html
+  <img src='x&#39; onerror=&#39;alert(1)'>
+```
+
+Which will not run the attacking script.
+
 
 ### js(value)
 
