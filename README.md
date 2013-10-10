@@ -97,7 +97,7 @@ Contexts:
   <div class='USERINPUT'></div>
 ```
 
-**CAUTION**: this is not the correct encoding for embedding the contents of
+:warning: **CAUTION**: this is not the correct encoding for embedding the contents of
 a `<script>` or `<style>` block (plus other blocks that cannot have
 entity-encoded characters).
 
@@ -153,10 +153,10 @@ Sanitizes output for JavaScript _string_ contexts using backslash-encoding.
 The `<` and `>` characters are encoded as `\u003C` and `\u003E`, respectively.
 This prevents breaking out of a surrounding `<script>` context.
 
-**CAUTION**: you need to always put quotes around the embedded value; don't
+:warning: **CAUTION**: you need to always put quotes around the embedded value; don't
 assume that it's a bare int/float/boolean constant!
 
-**CAUTION**: this is not the correct encoding for the entire contents of a
+:warning: **CAUTION**: this is not the correct encoding for the entire contents of a
 `<script>` block!  You need to sanitize each variable in-turn.
 
 ### jsAttr(value)
