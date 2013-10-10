@@ -58,7 +58,7 @@ Then, within an EJS template:
   </script>
   <a href="/welcome/<%-: userId |uri%>">Welcome <%-: userName |html%></a>
   <br>
-  <a href="javascript:activate('<%-: userId |jsAttr')">Click here to activate</a>
+  <a href="javascript:activate('<%-: userId |jsAttr%>')">Click here to activate</a>
 ```
 
 ## As Normal Functions
@@ -67,7 +67,7 @@ The filter functions are just regular functions and can be used outside of EJS.
 
 ```js
   var htmlEscape = require('secure-filters').html;
-  var escaped = htmlEscape('"><script>alert('pwn')</script>');
+  var escaped = htmlEscape('"><script>alert(\'pwn\')</script>');
   assert.equal(escaped,
     '&quot;&gt;&lt;script&gt;alert(&#39;pwn&#39;)&lt;script&gt;');
 ```
