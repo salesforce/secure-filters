@@ -1,8 +1,42 @@
 # secure-filters
 
 `secure-filters` is a collection of sanitization functions ("filters") to
-provide protection against Cross-Site Scripting (XSS) and other injection
-attacks.
+provide protection against [Cross-Site Scripting (XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29)
+and other injection attacks.
+
+XSS is the [#3 most critical security flaw affecting web
+applications](https://www.owasp.org/index.php/Top_10_2013-A3-Cross-Site_Scripting_%28XSS%29)
+for 2013, as determined by a broad consensus among
+[OWASP](https://www.owasp.org) members.
+
+To effectively combat XSS, you must combine input validation with output
+sanitization. This module aims to provide only output sanitization since there
+are plenty of JavaScript modules out there to do the validation part.
+
+Whichever input validation and output sanitization modules you end up using,
+please review the code carefully and apply your own professional paranoia.
+
+### Input Validation
+
+You can roll your own input validation or you can use an existing module.  Either way, there are
+[many](https://owasp.org/index.php/Data_Validation)
+[important](https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security)
+[rules](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet) to follow.
+
+http://stackoverflow.com/questions/4088723/validation-library-for-node-js lists
+several input validation options specific to node.js.
+
+One of those options is node-validator ([NPM](https://npmjs.org/package/validator),
+[github](https://github.com/chriso/node-validator)).
+It provides an impressive list of chainable validators. In addition to
+validation, it gives a set of handy [sanitization
+filters](https://github.com/chriso/node-validator#list-of-sanitization--filter-methods).
+There's even an `xss()` filter function that can strip-out certain _common_ XSS
+attack-strings. But, use caution: XSS attacks can be so highly obfuscated that
+they may be able to bypass Validator's detection algorithm. Validator also has
+a 3rd party [express-validate](https://github.com/Dream-Web/express-validate)
+middleware module for use in the popular [Express](http://expressjs.com/)
+node.js server.
 
 # Usage
 
