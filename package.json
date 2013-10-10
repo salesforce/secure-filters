@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test.js"
   },
-  "repository": "",
+  "repository": "git@github.com:goinstant/secure-filters.git",
   "author": "GoInstant Inc., a salesforce.com company",
   "license": "Apache 2",
   "devDependencies": {
