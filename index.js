@@ -23,13 +23,41 @@
  * simplicity, can easily be used in other contexts.
  *
  * By convention, `USERINPUT` is the string that is being embedded into a
- * certain context. It is vitally important to choose the function that matches
- * the particular context, so example contexts are given for each function.
- * Beware of subtle differences, e.g. the `jsAttr` filter.
+ * certain context. It is _extremely_ important to choose the escaping function
+ * that matches the particular context, so example contexts are given for each
+ * function.  Beware of subtle differences, e.g. the `jsAttr` filter.
+ *
+ * In summary:
+ * - `html()` - Sanitizes HTML contexts using entity-encoding.
+ * - `js()` - Sanitizes JavaScript string contexts using backslash-encoding.
+ * - `jsAttr()` - Sanitizes JavaScript string contexts _in an HTML attribute_
+ *   using a combination of entity- and backslash-encoding.
+ * - `uri()` - Sanitizes URI contexts using percent-encoding.
  */
 
 'use strict';
 var secureFilters = exports;
+
+/**
+ * Adds this module's filters to ejs.
+ *
+ * **USAGE**:
+ *
+ * ```js
+ *   var secureFilters = require('secure-filters');
+ *   var ejs = secureFilters.configure(require('ejs'));
+ * ```
+ *
+ * @param {Object} ejs the EJS package object
+ * @return {Object} the same EJS object
+ */
+secureFilters.configure = function(ejs) {
+  ejs.filters = ejs.filters || {};
+  ['html','js','jsAttr','uri'].forEach(function(filterName) {
+    ejs.filters[filterName] = secureFilters[filterName];
+  });
+  return ejs;
+};
 
 var AMP_NO_DOUBLE = /&(?!(?:amp|quot|#39|lt|gt);)/g;
 var QUOT = /\"/g;

@@ -93,6 +93,8 @@ describe('secure filters', function() {
         }
 
         var func = secureFilters[filterName];
+        assert(func);
+        assert.strictEqual(typeof func, "function");
         var expect = c[filterName];
         it('filter '+filterName+' produces "'+expect+'"', function() {
           var output = func(input);
@@ -100,5 +102,29 @@ describe('secure filters', function() {
         });
       });
     });
+  });
+});
+
+describe('exporting to EJS', function() {
+  function checkAllFilters(ejs) {
+    assert(ejs.filters);
+    assert(ejs.filters instanceof Object);
+    var keys = Object.keys(ejs.filters);
+    assert.equal(keys.length, 4);
+    assert('html' in ejs.filters);
+    assert('js' in ejs.filters);
+    assert('jsAttr' in ejs.filters);
+    assert('uri' in ejs.filters);
+  }
+
+  it('.configure()s an empty object', function() {
+    var mockEjs = {};
+    secureFilters.configure(mockEjs);
+    checkAllFilters(mockEjs);
+  });
+  it('.configure()s an object with .filters', function() {
+    var mockEjs = { filters: {} };
+    secureFilters.configure(mockEjs);
+    checkAllFilters(mockEjs);
   });
 });

@@ -1,12 +1,12 @@
 {
   "name": "secure-filters",
   "version": "0.0.0",
-  "description": "Anti-XSS Security Filters",
+  "description": "Anti-XSS filters for security",
   "main": "index.js",
   "scripts": {
     "test": "mocha test.js"
   },
-  "repository": "git@github.com:goinstant/secure-filters.git",
+  "repository": "",
   "author": "GoInstant Inc., a salesforce.com company",
   "license": "Apache 2",
   "devDependencies": {
