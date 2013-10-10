@@ -110,15 +110,16 @@ At the time of this writing, EJS doesn't escape the `'`
 XSS accidents!  Consider the template:
 
 ```html
-  <div class='<%= prefs.class %>'></div>
+  <img src='<%= prefs.avatar %>'>
 ```
 
-When given user input `'><script src='pwn.js'></script><div class='`, this gets
-rendered as:
+When given user input `x' onerror='alert(1)`, this gets rendered as:
 
 ```html
-  <div class=''><script src='pwn.js'></script><div class=''></div>
+  <img src='x' onerror='alert(1)'>
 ```
+
+Which will cause the `onerror` javascript to run.
 
 ### js(value)
 
