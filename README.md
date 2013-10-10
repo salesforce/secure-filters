@@ -57,6 +57,8 @@ Then, within an EJS template:
     var userId = parseInt('<%-: userId |js%>',10);
   </script>
   <a href="/welcome/<%-: userId |uri%>">Welcome <%-: userName |html%></a>
+  <br>
+  <a href="javascript:activate('<%-: userId |jsAttr')">Click here to activate</a>
 ```
 
 ## As Normal Functions
