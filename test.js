@@ -19,19 +19,6 @@ var assert = require('assert');
 
 var secureFilters = require('./index');
 
-/* crazy test vectors from http://code.google.com/p/browsersec/wiki/Part1
- * 01: <B <SCRIPT>alert(1)</SCRIPT>>
- * 02: <B="<SCRIPT>alert(1)</SCRIPT>">
- * 03: <IMG SRC=`javascript:alert(1)`>
- * 04: <S[0x00]CRIPT>alert(1)</S[0x00]CRIPT>
- * 05: <A """><IMG SRC="javascript:alert(1)">
- * 06: <IMG onmouseover =alert(1)>
- * 07: <A/HREF="javascript:alert(1)">
- * 08: <!-- Hello -- world > <SCRIPT>alert(1)</SCRIPT> -->
- * 09: <IMG ALT="><SCRIPT>alert(1)</SCRIPT>"(EOF)
- * 10: <![><IMG ALT="]><SCRIPT>alert(1)</SCRIPT>">
- */
-
 var ALL_CASES = [
   {
     input: '&&amp;\'d',
