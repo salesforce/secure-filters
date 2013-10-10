@@ -40,16 +40,16 @@ The filter functions are just regular functions and can be used outside of EJS.
 
 Available functions:
 
-- [`html(val)`](#html-val) - Sanitizes HTML contexts using entity-encoding.
-- [`js(val)`](#js-val) - Sanitizes JavaScript string contexts using backslash-encoding.
-- [`jsAttr()`](#js-val) - Sanitizes JavaScript string contexts _in an HTML attribute_
+- [`html(value)`](#htmlvalue) - Sanitizes HTML contexts using entity-encoding.
+- [`js(value)`](#jsvalue) - Sanitizes JavaScript string contexts using backslash-encoding.
+- [`jsAttr(value)`](#jsattrvalue) - Sanitizes JavaScript string contexts _in an HTML attribute_
   using a combination of entity- and backslash-encoding.
-- [`uri()`](#uri-val) - Sanitizes URI contexts using percent-encoding.
+- [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
 
 By convention in the Contexts below, `USERINPUT` should be replaced with the
 output of the filter function.
 
-### html(val)
+### html(value)
 
 Sanitizes output for HTML element and attribute contexts using entity-encoding.
 
@@ -86,7 +86,7 @@ rendered as:
   <div class=''><script src='pwn.js'></script><div class=''></div>
 ```
 
-### js(val)
+### js(value)
 
 Sanitizes output for JavaScript _string_ contexts using backslash-encoding.
 
@@ -109,7 +109,7 @@ assume that it's a bare int/float/boolean constant!
 **CAUTION**: this is not the correct encoding for the entire contents of a
 `<script>` block!  You need to sanitize each variable in-turn.
 
-### jsAttr(val)
+### jsAttr(value)
 
 Sanitizes output for embedded HTML scripting attributes using a special
 combination of backslash- and entity-encoding.
@@ -120,7 +120,7 @@ combination of backslash- and entity-encoding.
 
 The string `<ha>, 'ha', "ha"` is escaped to `&lt;ha&gt;, \&#39;ha\&#39;, \&quot;ha\&quot;`. Note the backslashes before the apostrophe and quote entities.
 
-### uri(val)
+### uri(value)
 
 Sanitizes output in URI component contexts by using percent-encoding.
 

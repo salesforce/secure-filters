@@ -225,6 +225,6 @@ secureFilters.uri = function(val) {
       output += (c < 16 ? '%0' : '%') + c.toString(16).toUpperCase();
     }
   }
-  
+
   return output;
 };
