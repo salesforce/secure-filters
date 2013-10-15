@@ -54,6 +54,7 @@ Then, within an EJS template:
 
 ```html
   <script>
+    var config = <%-: config |jsObj%>;
     var userId = parseInt('<%-: userId |js%>',10);
   </script>
   <a href="/welcome/<%-: userId |uri%>">Welcome <%-: userName |html%></a>
@@ -78,6 +79,8 @@ Available functions:
 
 - [`html(value)`](#htmlvalue) - Sanitizes HTML contexts using entity-encoding.
 - [`js(value)`](#jsvalue) - Sanitizes JavaScript string contexts using backslash-encoding.
+- [`jsObj(value)`](#jsobjvalue) - Sanitizes JavaScript literals (numbers, strings,
+  booleans, arrays, and objects) for inclusion in an HTML script context.
 - [`jsAttr(value)`](#jsattrvalue) - Sanitizes JavaScript string contexts _in an HTML attribute_
   using a combination of entity- and backslash-encoding.
 - [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
@@ -158,6 +161,29 @@ assume that it's a bare int/float/boolean constant!
 
 :warning: **CAUTION**: this is not the correct encoding for the entire contents of a
 `<script>` block!  You need to sanitize each variable in-turn.
+
+### jsObj(value)
+
+Sanitizes output for a JavaScript literal in an HTML script context.
+
+```html
+  <script>
+    var config = USERINPUT;
+  </script>
+```
+
+Specifically, this function encodes the object with `JSON.stringify()`, then
+replaces `<` with `\u003C` and `>` with `\u003E` to prevent breaking
+out of the surrounding script context.
+
+For example, with a literal object like `{username:'Albert
+</script><script>alert("Pwnerton")'}`, gives output:
+
+```html
+  <script>
+    var config = {"username":"\u003C/script\u003E\u003Cscript\u003Ealert(\"Pwnerton\")"};
+  </script>
+```
 
 ### jsAttr(value)
 
