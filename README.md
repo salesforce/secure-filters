@@ -44,7 +44,8 @@ node.js server.
 
 ## With EJS
 
-To configure EJS, simply wrap your `require('ejs')` call:
+To configure EJS, simply wrap your `require('ejs')` call.  This will import the
+filters using the names pre-defined by this module.
 
 ```js
   var ejs = require('secure-filters').configure(require('ejs'));
@@ -59,6 +60,42 @@ Then, within an EJS template:
   <a href="/welcome/<%-: userId |uri%>">Welcome <%-: userName |html%></a>
   <br>
   <a href="javascript:activate('<%-: userId |jsAttr%>')">Click here to activate</a>
+```
+
+### Alternative EJS uses.
+
+It's possible that the filter names pre-defined by this module interferes with
+existing filters that you've written. Or, you may wish to import a sub-set of
+the filters. In which case, you can simply assign properties to the
+`ejs.filters` object.
+
+```js
+  var secureFilters = require('secure-filters');
+  var ejs = require('ejs');
+  ejs.filters.secJS = secureFilters.js;
+```
+
+```html
+  <script>
+    var myStr = "<%-: myVal | secJS %>";
+  </script>
+```
+
+Or, you can namespace using a parametric style, similar to how EJS' pre-defined
+`get:'prop'` filter works:
+
+```js
+  var secureFilters = require('secure-filters');
+  var ejs = require('ejs');
+  ejs.filters.sec = function(val, context) {
+    return secureFilters[context](val);
+  };
+```
+
+```html
+  <script>
+    var myStr = "<%-: myVal | sec:'js' %>";
+  </script>
 ```
 
 ## As Normal Functions
