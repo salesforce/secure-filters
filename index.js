@@ -56,6 +56,7 @@ var APOS = /\'/g;
 var LT = /</g;
 var GT = />/g;
 var BS = /\\/g;
+var BT = /`/g;
 var AST = /\*/g;
 var TILDE = /~/g;
 var BANG = /!/g;
@@ -84,14 +85,27 @@ var RPAREN = /\)/g;
  * @return {string} the encoded string
  */
 secureFilters.html = function(val) {
-  return String(val)
+  var output = String(val)
     // & not followed by certain entities:
     .replace(AMP_NO_DOUBLE, '&amp;')
     // then, after we've replaced &, get the rest:
     .replace(QUOT, '&quot;')
     .replace(APOS, '&#39;')
+    .replace(BT, '&#96;')
     .replace(LT, '&lt;')
     .replace(GT, '&gt;');
+
+  // ref: https://cure53.de/fp170.pdf Sections 3.1 and 5.1
+  // ref: implementation in https://code.google.com/p/owasp-java-html-sanitizer/source/browse/trunk/src/tests/org/owasp/html/HtmlSanitizerTest.java#264
+  // prevent mXSS attack on IE8 where you can escape out of an attribute
+  // context when code is assigned to `.innerHTML` and the attribute has '``'
+  // and no whitespace.
+  if (/(?:&#96;|&#x60;)/.test(output) &&
+      !/\s/.test(output)) {
+    output += ' ';
+  }
+
+  return output;
 };
 
 /**

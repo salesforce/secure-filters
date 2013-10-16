@@ -43,11 +43,11 @@ var ALL_CASES = [
     uri: '%3Cha%3E%2C%20%27ha%27%2C%20%22ha%22',
   },
   {
-    input: '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~', // punctuation in ASCII range (byte order)
-    html: '!&quot;#$%&amp;&#39;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~',
-    js: '!\\"#$%&\\\'()\\*+,-./:;\\u003C=\\u003E?@[\\\\]^_`{|}~',
-    jsAttr: '!\\&quot;#$%&amp;\\&#39;()\\*+,-./:;&lt;=&gt;?@[\\\\]^_`{|}~',
-    uri: '%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E',
+    input: 'a !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~', // punctuation in ASCII range (byte order)
+    html: 'a !&quot;#$%&amp;&#39;()*+,-./:;&lt;=&gt;?@[\\]^_&#96;{|}~',
+    js: 'a !\\"#$%&\\\'()\\*+,-./:;\\u003C=\\u003E?@[\\\\]^_`{|}~',
+    jsAttr: 'a !\\&quot;#$%&amp;\\&#39;()\\*+,-./:;&lt;=&gt;?@[\\\\]^_`{|}~',
+    uri: 'a%20%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E',
   },
   {
     input: '%3Cscript%3E', // i.e., already uri-encoded
@@ -105,6 +105,18 @@ var ALL_CASES = [
     label: 'array literal',
     input: [1,2.3,"ouch",'</script><script>alert(\"hah!\")'],
     jsObj: '[1,2.3,"ouch","\\u003C/script\\u003E\\u003Cscript\\u003Ealert(\\"hah!\\")"]'
+  },
+
+  // prevent mXSS attack on IE8
+  {
+    label: 'backticks in attribute',
+    input: '``onload=xss()',
+    html: '&#96;&#96;onload=xss() ' // added trailing space
+  },
+  {
+    label: 'backticks in attribute w/ space',
+    input: '`` onload=xss()',
+    html: '&#96;&#96; onload=xss()' // no trailing space
   }
 ];
 
