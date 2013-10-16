@@ -271,6 +271,18 @@ var ALL_CASES = [
     label: "nested array doesn't trigger CDATA protection",
     input: [[['a']],['b']],
     jsObj: '[[["a"]],["b"]]'
+  },
+
+  // prevent mXSS attack on IE8
+  {
+    label: 'backticks in attribute',
+    input: '``onload=xss()',
+    html: '&#96;&#96;onload=xss() ' // added trailing space
+  },
+  {
+    label: 'backticks in attribute w/ space',
+    input: '`` onload=xss()',
+    html: '&#96;&#96; onload=xss()' // no trailing space
   }
 ];
 
