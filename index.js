@@ -228,3 +228,31 @@ secureFilters.uri = function(val) {
 
   return output;
 };
+
+/**
+ * Encodes an object as JSON, but with unsafe characters in string literals
+ * backslash-escaped.
+ *
+ * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
+ *
+ * ```html
+ *   <script>
+ *     var config = USERINPUT;
+ *   </script>
+ * ```
+ *
+ * No special processing is required to parse the resulting JSON object.
+ *
+ * Specifically, this function encodes the object with `JSON.stringify()`, then
+ * replaces `<>` with `\u003C` and `\u003E`, respectively, to prevent breaking
+ * out of the surrounding script context.
+ *
+ * @name jsObj
+ * @param {any} val
+ * @return {string} the JSON- and backslash-encoded string
+ */
+secureFilters.jsObj = function(val) {
+  return JSON.stringify(val)
+    .replace(LT, '\\u003C')
+    .replace(GT, '\\u003E');
+};

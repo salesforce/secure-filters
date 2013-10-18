@@ -66,6 +66,44 @@ var ALL_CASES = [
     label: 'control characters',
     input: '\u0000,\u0001,\u0002...\u001F',
     uri: '%00%2C%01%2C%02...%1F',
+  },
+
+  {
+    label: 'integer literal',
+    input: 1234,
+    html: "1234",
+    js: "1234",
+    jsAttr: "1234",
+    uri: "1234",
+    jsObj: "1234"
+  },
+  {
+    label: 'boolean literal',
+    input: true,
+    html: "true",
+    js: "true",
+    jsAttr: "true",
+    uri: "true",
+    jsObj: "true"
+  },
+  {
+    label: 'float literal',
+    input: 1234.5678,
+    html: "1234.5678",
+    js: "1234.5678",
+    jsAttr: "1234.5678",
+    uri: "1234.5678",
+    jsObj: "1234.5678"
+  },
+  {
+    label: 'object literal',
+    input: {key:"</script><script>alert(\"hah!\")"},
+    jsObj: '{"key":"\\u003C/script\\u003E\\u003Cscript\\u003Ealert(\\"hah!\\")"}'
+  },
+  {
+    label: 'array literal',
+    input: [1,2.3,"ouch",'</script><script>alert(\"hah!\")'],
+    jsObj: '[1,2.3,"ouch","\\u003C/script\\u003E\\u003Cscript\\u003Ealert(\\"hah!\\")"]'
   }
 ];
 
