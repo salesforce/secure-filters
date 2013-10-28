@@ -66,6 +66,10 @@ var LT = /</g;
 var GT = />/g;
 var BS = /\\/g;
 var AST = /\*/g;
+var TILDE = /~/g;
+var BANG = /!/g;
+var LPAREN = /\(/g;
+var RPAREN = /\)/g;
 
 /**
  * Encodes values for safe embedding in HTML tags and attributes.
@@ -207,26 +211,15 @@ secureFilters.jsAttr = function(val) {
  * @return {string} the percent-encoded string
  */
 secureFilters.uri = function(val) {
-  var output = "";
-  var bytes = new Buffer(String(val), 'utf8'); // parse into utf8 bytes
-
-  for (var i = 0; i < bytes.length; i++) {
-    var c = bytes[i];
-    if (
-      (0x30 <= c && c <= 0x39) || // 0 .. 9
-      (0x41 <= c && c <= 0x5A) || // A .. Z
-      (0x61 <= c && c <= 0x7A) || // a .. z
-      (c === 0x2D) || // -
-      (c === 0x2E) || // .
-      (c === 0x5F)    // _
-    ) {
-      output += String.fromCharCode(c);
-    } else {
-      output += (c < 16 ? '%0' : '%') + c.toString(16).toUpperCase();
-    }
-  }
-
-  return output;
+  // "encodeURIComponent() will not encode ~!*()'"
+  var encode = encodeURIComponent(String(val));
+  return encode
+    .replace(BANG, '%21')
+    .replace(APOS, '%27')
+    .replace(LPAREN, '%28')
+    .replace(RPAREN, '%29')
+    .replace(AST, '%2A')
+    .replace(TILDE, '%7E');
 };
 
 /**

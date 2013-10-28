@@ -19,6 +19,9 @@ var assert = require('assert');
 
 var secureFilters = require('./index');
 
+// Test character outside of the unicode BMP:
+var FACE_WITHOUT_MOUTH = "\uD83D\uDE36"; // U+1F636, UTF-8: F0 9F 98 B6
+
 var ALL_CASES = [
   {
     input: '&&amp;\'d',
@@ -56,11 +59,11 @@ var ALL_CASES = [
     uri: '%253Cscript%253E',
   },
   {
-    input: "é,ß,&☃",
-    html: "é,ß,&amp;☃",
-    js: "é,ß,&☃",
-    jsAttr: "é,ß,&amp;☃",
-    uri: '%C3%A9%2C%C3%9F%2C%26%E2%98%83',
+    input: "é,ß,&☃ "+FACE_WITHOUT_MOUTH,
+    html: "é,ß,&amp;☃ "+FACE_WITHOUT_MOUTH,
+    js: "é,ß,&☃ "+FACE_WITHOUT_MOUTH,
+    jsAttr: "é,ß,&amp;☃ "+FACE_WITHOUT_MOUTH,
+    uri: '%C3%A9%2C%C3%9F%2C%26%E2%98%83%20%F0%9F%98%B6',
   },
   {
     label: 'control characters',
