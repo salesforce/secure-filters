@@ -202,7 +202,7 @@ secureFilters.jsAttr = function(val) {
  * also HTML-safe, it may be sufficient to just URI-encode the untrusted
  * components if you know the rest is application-supplied.
  *
- * @name jsAttr
+ * @name uri
  * @param {any} val will be converted to a String prior to encoding
  * @return {string} the percent-encoded string
  */
