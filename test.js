@@ -2,11 +2,20 @@
  * Copyright 2013 GoInstant Inc., a salesforce.com company
  * See LICENSE.txt for details.
  */
-
+(function(root) {
 'use strict';
-var assert = require('assert');
 
-var secureFilters = require('./index');
+var assert;
+var secureFilters;
+
+if (typeof module !== 'undefined' && module.exports) {
+  assert = require('gi-assert');
+  secureFilters = require('./index');
+} else {
+  assert = root.assert;
+  secureFilters = root.secureFilters;
+}
+
 
 // Test character outside of the unicode BMP:
 var FACE_WITHOUT_MOUTH = "\uD83D\uDE36"; // U+1F636, UTF-8: F0 9F 98 B6
@@ -145,3 +154,5 @@ describe('exporting to EJS', function() {
     checkAllFilters(mockEjs);
   });
 });
+
+}(this));

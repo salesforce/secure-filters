@@ -2,6 +2,11 @@
  * Copyright 2013 GoInstant Inc., a salesforce.com company
  * See LICENSE.txt for details.
  */
+(function(root) {
+/*global define,module */
+'use strict';
+var secureFilters = {};
+secureFilters.constructor = function secureFilters(){};
 
 /**
  * @fileOverview
@@ -23,9 +28,6 @@
  *   using a combination of entity- and backslash-encoding.
  * - `uri()` - Sanitizes URI contexts using percent-encoding.
  */
-
-'use strict';
-var secureFilters = exports;
 
 /**
  * Adds this module's filters to ejs.
@@ -238,3 +240,21 @@ secureFilters.jsObj = function(val) {
     .replace(LT, '\\u003C')
     .replace(GT, '\\u003E');
 };
+
+
+// AMD / RequireJS
+if (typeof define !== 'undefined' && define.amd) {
+  define([], function () {
+    return secureFilters;
+  });
+}
+// CommonJS / Node.js
+else if (typeof module !== 'undefined' && module.exports) {
+  module.exports = secureFilters;
+}
+// included directly via <script> tag
+else {
+  root.secureFilters = secureFilters;
+}
+
+}(this));
