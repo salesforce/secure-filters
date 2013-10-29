@@ -258,6 +258,6 @@ For questions, comments, and responsible disclosures, please contact
 
 # License
 
-Copyright 2013 GoInstant Inc., a salesforce.com company
+&copy; 2013 GoInstant Inc., a salesforce.com company
 
 Licensed under the BSD 3-clause license.
