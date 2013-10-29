@@ -1,0 +1,1 @@
+../node_modules/gi-assert/index.js
