@@ -1,5 +1,6 @@
 /*!
  * Copyright 2013 GoInstant Inc., a salesforce.com company
+ * See LICENSE.txt for details.
  */
 
 /**
