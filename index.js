@@ -26,6 +26,8 @@ secureFilters.constructor = function secureFilters(){};
  * - `js()` - Sanitizes JavaScript string contexts using backslash-encoding.
  * - `jsAttr()` - Sanitizes JavaScript string contexts _in an HTML attribute_
  *   using a combination of entity- and backslash-encoding.
+ * - `jsObj()` - Sanitizes JavaScript objects for inclusion in HTML-script
+ *   context.
  * - `uri()` - Sanitizes URI contexts using percent-encoding.
  */
 

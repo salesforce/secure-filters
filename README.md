@@ -107,7 +107,7 @@ The filter functions are just regular functions and can be used outside of EJS.
   var htmlEscape = require('secure-filters').html;
   var escaped = htmlEscape('"><script>alert(\'pwn\')</script>');
   assert.equal(escaped,
-    '&quot;&gt;&lt;script&gt;alert(&#39;pwn&#39;)&lt;script&gt;');
+    '&quot;&gt;&lt;script&gt;alert&#40;&#39;pwn&#39;&#41;&lt;&#47;script&gt;');
 ```
 
 # Functions
@@ -141,7 +141,10 @@ Contexts:
 a `<script>` or `<style>` block (plus other blocks that cannot have
 entity-encoded characters).
 
-Avoids double-encoding `&quot;`, `&#39;`, `&lt;`, and `&gt;`.
+Any character not matched by `/[\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/` is
+replaced with an HTML entity.  Additionally, characters in the set
+`\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F` are converted to spaces to avoid browser
+quirks that interpret these as non-characters.
 
 #### A Note About `<%= %>`
 
@@ -170,7 +173,7 @@ Which will cause the `onerror` javascript to run.  Using this module's filter sh
 When given user input `x' onerror='alert(1)`, the above gets rendered as:
 
 ```html
-  <img src='x&#39; onerror=&#39;alert(1)'>
+  <img src='x&#39; onerror&#61;&#39;alert&#40;1&#41;'>
 ```
 
 Which will not run the attacking script.
@@ -190,16 +193,15 @@ Sanitizes output for JavaScript _string_ contexts using backslash-encoding.
   </script>
 ```
 
-The `<` and `>` characters are encoded as `\u003C` and `\u003E`, respectively.
-This prevents breaking out of a surrounding `<script>` context.  The following
-characters are also backslash-escaped: `\*"'/`.  The string `]]>` is encoded as
-`\]\]\u003E` to prevent breaking out of CDATA context.
-
 :warning: **CAUTION**: you need to always put quotes around the embedded value; don't
 assume that it's a bare int/float/boolean constant!
 
 :warning: **CAUTION**: this is not the correct encoding for the entire contents of a
 `<script>` block!  You need to sanitize each variable in-turn.
+
+Any character not matched by `/[,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/` is escaped as
+`\xHH` where `H` is a hexidecimal digit. (Note that all unicode characters with
+3+ hex digits are matched).
 
 ### jsObj(value)
 
@@ -212,8 +214,8 @@ Sanitizes output for a JavaScript literal in an HTML script context.
 ```
 
 Specifically, this function encodes the object with `JSON.stringify()`, then
-replaces `<` with `\u003C` and `>` with `\u003E` to prevent breaking out of the
-surrounding script context.  The string `]]>` is encoded as `\]\]\u003E` to
+replaces `<` with `\x3C` and `>` with `\x3E` to prevent breaking out of the
+surrounding script context.  The string `]]>` is encoded as `\x5D\x5D\x3E` to
 prevent breaking out of CDATA context.
 
 For example, with a literal object like `{username:'Albert
@@ -221,7 +223,7 @@ For example, with a literal object like `{username:'Albert
 
 ```html
   <script>
-    var config = {"username":"\u003C/script\u003E\u003Cscript\u003Ealert(\"Pwnerton\")"};
+    var config = {"username":"\x3C/script\x3E\x3Cscript\x3Ealert(\"Pwnerton\")"};
   </script>
 ```
 
