@@ -139,7 +139,7 @@ secureFilters.html = function(val) {
  * hexadecimal digit.
  *
  * **CAUTION**: you need to always put quotes around the embedded value; don't
- * assume that its an int/float/boolean bare constant!
+ * assume that it's an int/float/boolean bare constant!
  *
  * **CAUTION**: this is not the correct encoding for the entire contents of a
  * `<script>` block!  You need to sanitize each variable in-turn.
