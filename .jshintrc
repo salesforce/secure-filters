@@ -2,7 +2,8 @@
     "passfail"      : false,
     "maxerr"        : 100,
 
-    "browser"       : false,
+    "es3"           : true,
+    "browser"       : true,
     "node"          : true,
     "rhino"         : false,
     "couch"         : false,

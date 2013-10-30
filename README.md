@@ -191,7 +191,9 @@ Sanitizes output for JavaScript _string_ contexts using backslash-encoding.
 ```
 
 The `<` and `>` characters are encoded as `\u003C` and `\u003E`, respectively.
-This prevents breaking out of a surrounding `<script>` context.
+This prevents breaking out of a surrounding `<script>` context.  The following
+characters are also backslash-escaped: `\*"'/`.  The string `]]>` is encoded as
+`\]\]\u003E` to prevent breaking out of CDATA context.
 
 :warning: **CAUTION**: you need to always put quotes around the embedded value; don't
 assume that it's a bare int/float/boolean constant!
@@ -210,8 +212,9 @@ Sanitizes output for a JavaScript literal in an HTML script context.
 ```
 
 Specifically, this function encodes the object with `JSON.stringify()`, then
-replaces `<` with `\u003C` and `>` with `\u003E` to prevent breaking
-out of the surrounding script context.
+replaces `<` with `\u003C` and `>` with `\u003E` to prevent breaking out of the
+surrounding script context.  The string `]]>` is encoded as `\]\]\u003E` to
+prevent breaking out of CDATA context.
 
 For example, with a literal object like `{username:'Albert
 </script><script>alert("Pwnerton")'}`, gives output:

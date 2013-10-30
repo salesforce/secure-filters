@@ -16,52 +16,139 @@ if (typeof module !== 'undefined' && module.exports) {
   secureFilters = root.secureFilters;
 }
 
+// Test character inside the Unicode BMP:
+var SNOWMAN = "\u2603";
+// Test character outside of the Unicode BMP:
+var FACE_WITHOUT_MOUTH = "\uD83D\uDE36"; // U+1F636, UTF-16: D83D DE36, UTF-8: F0 9F 98 B6
 
-// Test character outside of the unicode BMP:
-var FACE_WITHOUT_MOUTH = "\uD83D\uDE36"; // U+1F636, UTF-8: F0 9F 98 B6
+var ASCII = "\0";
+for (var i = 1; i <= 0x7F; i++) {
+  ASCII += String.fromCharCode(i);
+}
 
 var ALL_CASES = [
   {
     input: '&&amp;\'d',
-    html: '&amp;&amp;&#39;d',
-    js: '&&amp;\\\'d',
-    jsAttr: '&amp;&amp;\\&#39;d',
+    html: '&amp;&amp;amp&#59;&#39;d',
+    js: '\\x26\\x26amp\\x3B\\x27d',
+    jsAttr: '&#92;x26&#92;x26amp&#92;x3B&#92;x27d',
     uri: '%26%26amp%3B%27d'
   },
   {
     input: '\' onload="alert(1)"',
-    html: '&#39; onload=&quot;alert(1)&quot;',
-    js: '\\\' onload=\\"alert(1)\\"',
-    jsAttr: '\\&#39; onload=\\&quot;alert(1)\\&quot;',
+    html: '&#39; onload&#61;&quot;alert&#40;1&#41;&quot;',
+    js: '\\x27\\x20onload\\x3D\\x22alert\\x281\\x29\\x22',
+    jsAttr: '&#92;x27&#92;x20onload&#92;x3D&#92;x22alert&#92;x281&#92;x29&#92;x22',
     uri: '%27%20onload%3D%22alert%281%29%22'
   },
   {
     input: '<ha>, \'ha\', "ha"',
     html: '&lt;ha&gt;, &#39;ha&#39;, &quot;ha&quot;',
-    js: '\\u003Cha\\u003E, \\\'ha\\\', \\"ha\\"',
-    jsAttr: '&lt;ha&gt;, \\&#39;ha\\&#39;, \\&quot;ha\\&quot;',
+    js: '\\x3Cha\\x3E,\\x20\\x27ha\\x27,\\x20\\x22ha\\x22',
+    jsAttr: '&#92;x3Cha&#92;x3E,&#92;x20&#92;x27ha&#92;x27,&#92;x20&#92;x22ha&#92;x22',
     uri: '%3Cha%3E%2C%20%27ha%27%2C%20%22ha%22'
   },
   {
-    input: '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~', // punctuation in ASCII range (byte order)
-    html: '!&quot;#$%&amp;&#39;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~',
-    js: '!\\"#$%&\\\'()\\*+,-./:;\\u003C=\\u003E?@[\\\\]^_`{|}~',
-    jsAttr: '!\\&quot;#$%&amp;\\&#39;()\\*+,-./:;&lt;=&gt;?@[\\\\]^_`{|}~',
+    label: "ESAPI bad JS chars",
+    input: "!@$%()=+{}[]",
+    html: "&#33;&#64;&#36;&#37;&#40;&#41;&#61;&#43;&#x7B;&#x7D;&#91;&#93;",
+    js: "\\x21\\x40\\x24\\x25\\x28\\x29\\x3D\\x2B\\x7B\\x7D\\x5B\\x5D",
+    jsAttr: "&#92;x21&#92;x40&#92;x24&#92;x25&#92;x28&#92;x29&#92;x3D&#92;x2B&#92;x7B&#92;x7D&#92;x5B&#92;x5D",
+    uri: "%21%40%24%25%28%29%3D%2B%7B%7D%5B%5D"
+  },
+  {
+    label: "ESAPI maybe bad chars",
+    input: " ,.-_ ",
+    html: " ,.-_ ",
+    js: "\\x20,.-_\\x20",
+    jsAttr: "&#92;x20,.-_&#92;x20",
+    uri: "%20%2C.-_%20"
+  },
+  {
+    label: "ASCII punctuation",
+    input: '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~', // punctuation in ASCII range (lexical order)
+    html: '&#33;&quot;&#35;&#36;&#37;&amp;&#39;&#40;&#41;&#42;&#43;,-.&#47;&#58;&#59;&lt;&#61;&gt;&#63;&#64;&#91;&#92;&#93;&#94;_&#96;&#x7B;&#x7C;&#x7D;&#x7E;',
+    js: '\\x21\\x22\\x23\\x24\\x25\\x26\\x27\\x28\\x29\\x2A\\x2B,-.\\x2F\\x3A\\x3B\\x3C\\x3D\\x3E\\x3F\\x40\\x5B\\x5C\\x5D\\x5E_\\x60\\x7B\\x7C\\x7D\\x7E',
+    jsAttr: '&#92;x21&#92;x22&#92;x23&#92;x24&#92;x25&#92;x26&#92;x27&#92;x28&#92;x29&#92;x2A&#92;x2B,-.&#92;x2F&#92;x3A&#92;x3B&#92;x3C&#92;x3D&#92;x3E&#92;x3F&#92;x40&#92;x5B&#92;x5C&#92;x5D&#92;x5E_&#92;x60&#92;x7B&#92;x7C&#92;x7D&#92;x7E',
     uri: '%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E'
   },
   {
+    label: 'every ASCII char',
+    input: ASCII,
+    html:
+      '         \t\n  \r  '+ // most controls -> space (including NUL)
+      '                '+ // 0x10 to 0x1F -> space
+      ' ' + // space preserved
+      '&#33;&quot;&#35;&#36;&#37;&amp;&#39;&#40;&#41;&#42;&#43;'+
+      ',-.'+ // safe punctuation
+      '&#47;'+
+      '0123456789'+ // in alphanum
+      '&#58;&#59;&lt;&#61;&gt;&#63;&#64;'+
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+ // in alphanum
+      '&#91;&#92;&#93;&#94;'+
+      '_'+ // safe punctuation
+      '&#96;'+
+      'abcdefghijklmnopqrstuvwxyz'+ // in alphanum
+      '&#x7B;&#x7C;&#x7D;&#x7E;'+
+      ' ', // 0x7f -> space
+    js:
+      '\\x00\\x01\\x02\\x03\\x04\\x05\\x06\\x07\\x08\\x09\\x0A\\x0B\\x0C\\x0D\\x0E\\x0F\\x10\\x11\\x12\\x13\\x14\\x15\\x16\\x17\\x18\\x19\\x1A\\x1B\\x1C\\x1D\\x1E\\x1F\\x20\\x21\\x22\\x23\\x24\\x25\\x26\\x27\\x28\\x29\\x2A\\x2B'+
+      ',-.'+ // safe punctuation
+      '\\x2F'+
+      '0123456789'+ // in alphanum
+      '\\x3A\\x3B\\x3C\\x3D\\x3E\\x3F\\x40'+
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+ // in alphanum
+      '\\x5B\\x5C\\x5D\\x5E'+
+      '_'+ // safe punctuation
+      '\\x60'+
+      'abcdefghijklmnopqrstuvwxyz'+ // in alphanum
+      '\\x7B\\x7C\\x7D\\x7E\\x7F',
+    jsAttr:
+      '&#92;x00&#92;x01&#92;x02&#92;x03&#92;x04&#92;x05&#92;x06&#92;x07&#92;x08&#92;x09&#92;x0A&#92;x0B&#92;x0C&#92;x0D&#92;x0E&#92;x0F&#92;x10&#92;x11&#92;x12&#92;x13&#92;x14&#92;x15&#92;x16&#92;x17&#92;x18&#92;x19&#92;x1A&#92;x1B&#92;x1C&#92;x1D&#92;x1E&#92;x1F&#92;x20&#92;x21&#92;x22&#92;x23&#92;x24&#92;x25&#92;x26&#92;x27&#92;x28&#92;x29&#92;x2A&#92;x2B'+
+      ',-.'+
+      '&#92;x2F'+
+      '0123456789'+
+      '&#92;x3A&#92;x3B&#92;x3C&#92;x3D&#92;x3E&#92;x3F&#92;x40'+
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+
+      '&#92;x5B&#92;x5C&#92;x5D&#92;x5E'+
+      '_'+
+      '&#92;x60'+
+      'abcdefghijklmnopqrstuvwxyz'+
+      '&#92;x7B&#92;x7C&#92;x7D&#92;x7E&#92;x7F',
+    uri: '%00%01%02%03%04%05%06%07%08%09%0A%0B%0C%0D%0E%0F%10%11%12%13%14%15%16%17%18%19%1A%1B%1C%1D%1E%1F%20%21%22%23%24%25%26%27%28%29%2A%2B%2C'+
+      '-.'+ // uri-safe punctuation
+      '%2F'+
+      '0123456789'+ // in alphanum
+      '%3A%3B%3C%3D%3E%3F%40'+
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZ'+ // in alphanum
+      '%5B%5C%5D%5E'+
+      '_'+ // uri-safe punctuation
+      '%60'+
+      'abcdefghijklmnopqrstuvwxyz'+ // in alphanum
+      '%7B%7C%7D%7E%7F'
+  },
+  {
+    label: "URI-encoded input",
     input: '%3Cscript%3E', // i.e., already uri-encoded
-    html: '%3Cscript%3E',
-    js: '%3Cscript%3E',
-    jsAttr: '%3Cscript%3E',
+    html: '&#37;3Cscript&#37;3E',
+    js: '\\x253Cscript\\x253E',
+    jsAttr: '&#92;x253Cscript&#92;x253E',
     uri: '%253Cscript%253E'
   },
   {
-    input: "é,ß,&☃ "+FACE_WITHOUT_MOUTH,
-    html: "é,ß,&amp;☃ "+FACE_WITHOUT_MOUTH,
-    js: "é,ß,&☃ "+FACE_WITHOUT_MOUTH,
-    jsAttr: "é,ß,&amp;☃ "+FACE_WITHOUT_MOUTH,
-    uri: '%C3%A9%2C%C3%9F%2C%26%E2%98%83%20%F0%9F%98%B6'
+    input: "é, ß, "+SNOWMAN+", "+FACE_WITHOUT_MOUTH,
+    html: "é, ß, "+SNOWMAN+", "+FACE_WITHOUT_MOUTH,
+    js: "é,\\x20ß,\\x20"+SNOWMAN+",\\x20"+FACE_WITHOUT_MOUTH,
+    jsAttr: "é,&#92;x20ß,&#92;x20"+SNOWMAN+",&#92;x20"+FACE_WITHOUT_MOUTH,
+    uri: '%C3%A9%2C%20%C3%9F%2C%20%E2%98%83%2C%20%F0%9F%98%B6'
+  },
+  {
+    label: 'CDATA',
+    input: '<![CDATA[ blah ]]>',
+    html: '&lt;&#33;&#91;CDATA&#91; blah &#93;&#93;&gt;',
+    js: '\\x3C\\x21\\x5BCDATA\\x5B\\x20blah\\x20\\x5D\\x5D\\x3E',
+    jsAttr: '&#92;x3C&#92;x21&#92;x5BCDATA&#92;x5B&#92;x20blah&#92;x20&#92;x5D&#92;x5D&#92;x3E',
+    uri: '%3C%21%5BCDATA%5B%20blah%20%5D%5D%3E'
   },
   {
     label: 'control characters',
@@ -99,14 +186,25 @@ var ALL_CASES = [
   {
     label: 'object literal',
     input: {key:"</script><script>alert(\"hah!\")"},
-    jsObj: '{"key":"\\u003C/script\\u003E\\u003Cscript\\u003Ealert(\\"hah!\\")"}'
+    jsObj: '{"key":"\\x3C/script\\x3E\\x3Cscript\\x3Ealert(\\"hah!\\")"}'
   },
   {
     label: 'array literal',
     input: [1,2.3,"ouch",'</script><script>alert(\"hah!\")'],
-    jsObj: '[1,2.3,"ouch","\\u003C/script\\u003E\\u003Cscript\\u003Ealert(\\"hah!\\")"]'
+    jsObj: '[1,2.3,"ouch","\\x3C/script\\x3E\\x3Cscript\\x3Ealert(\\"hah!\\")"]'
+  },
+  {
+    label: 'CDATA in object',
+    input: {"open":"<![CDATA[", "close": "]]>"},
+    jsObj: '{"open":"\\x3C![CDATA[","close":"\\x5D\\x5D\\x3E"}'
+  },
+  {
+    label: "nested array doesn't trigger CDATA protection",
+    input: [[['a']],['b']],
+    jsObj: '[[["a"]],["b"]]'
   }
 ];
+
 
 describe('secure filters', function() {
   ALL_CASES.forEach(function(c) {
@@ -122,7 +220,7 @@ describe('secure filters', function() {
         assert(func);
         assert.strictEqual(typeof func, "function");
         var expect = c[filterName];
-        it('filter '+filterName+' produces "'+expect+'"', function() {
+        it('filter '+filterName+' encodes correctly', function() {
           var output = func(input);
           assert.strictEqual(output, expect);
         });
