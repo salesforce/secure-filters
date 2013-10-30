@@ -200,7 +200,7 @@ assume that it's a bare int/float/boolean constant!
 `<script>` block!  You need to sanitize each variable in-turn.
 
 Any character not matched by `/[,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/` is escaped as
-`\xHH` where `H` is a hexidecimal digit. (Note that all unicode characters with
+`\xHH` or `\uHHHH` where `H` is a hexidecimal digit. (Note that all unicode characters with
 3+ hex digits are matched).
 
 ### jsObj(value)
