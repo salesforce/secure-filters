@@ -152,6 +152,17 @@ var ALL_CASES = [
   },
 
   {
+    label: 'README html example',
+    input: '"><script>alert(\'pwn\')</script>',
+    html: '&quot;&gt;&lt;script&gt;alert&#40;&#39;pwn&#39;&#41;&lt;&#47;script&gt;'
+  },
+  {
+    label: 'README html example 2',
+    input: "x' onerror='alert(1)",
+    html: 'x&#39; onerror&#61;&#39;alert&#40;1&#41;'
+  },
+
+  {
     label: 'integer literal',
     input: 1234,
     html: "1234",
