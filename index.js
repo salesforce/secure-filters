@@ -63,12 +63,18 @@ var LPAREN = /\(/g;
 var RPAREN = /\)/g;
 var CDATA_CLOSE = /\]\]>/g;
 
-// alphanum plus ",._-" & unicode.
+// Matches alphanum plus ",._-" & unicode.
 // ESAPI doesn't consider "-" safe, but we do. It's both URI and HTML safe.
+// XXX: the 00A1-FFFF range can't be modified without changes to the code; see
+// below.
 var JS_NOT_WHITELISTED = /[^,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/g;
 
-var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g; // convert to " "
-// alphanum plus allowable whitespace, ",._-", and unicode.
+// Control characters that get converted to spaces.
+var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
+
+// Matches alphanum plus allowable whitespace, ",._-", and unicode.
+// XXX: the 00A1-FFFF range can't be modified without changes to the code; see
+// below.
 var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/g;
 
 /**
@@ -112,6 +118,10 @@ secureFilters.html = function(val) {
         var dec = code.toString(10);
         return '&#'+dec+';';
       } else {
+        // XXX: this doesn't produce strictly valid entities for code-points
+        // requiring a UTF-16 surrogate pair. However, browsers are generally
+        // tolerant of this. Surrogate pairs are currently in the whitelist
+        // defined via HTML_NOT_WHITELISTED.
         var hex = code.toString(16).toUpperCase();
         return '&#x'+hex+';';
       }
@@ -160,6 +170,9 @@ secureFilters.js = function(val) {
         return '\\x'+hex;
       }
     } else { // Unicode
+      // XXX: with the current definition of JS_NOT_WHITELISTED this block is
+      // unused. The Block is left in so that if the regex changes Unicode
+      // characters are encoded correctly.
       switch(hex.length) {
       case 2:
         return '\\u00'+hex;
