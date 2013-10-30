@@ -150,11 +150,6 @@ var ALL_CASES = [
     jsAttr: '&#92;x3C&#92;x21&#92;x5BCDATA&#92;x5B&#92;x20blah&#92;x20&#92;x5D&#92;x5D&#92;x3E',
     uri: '%3C%21%5BCDATA%5B%20blah%20%5D%5D%3E'
   },
-  {
-    label: 'control characters',
-    input: '\u0000,\u0001,\u0002...\u001F',
-    uri: '%00%2C%01%2C%02...%1F'
-  },
 
   {
     label: 'integer literal',
