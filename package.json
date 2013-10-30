@@ -4,7 +4,7 @@
   "description": "Anti-XSS filters for security",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha test.js"
+    "test": "mocha test.js"
   },
   "homepage": "https://github.com/goinstant/secure-filters",
   "repository": "git@github.com:goinstant/secure-filters.git",
