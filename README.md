@@ -143,6 +143,23 @@ entity-encoded characters).
 
 Avoids double-encoding `&quot;`, `&#39;`, `&lt;`, and `&gt;`.
 
+#### mXSS protection
+
+Some versions of IE are susceptible to an attack where a quoted attribute contains two backtick (U+0060) characters and the payload is part of a string assigned to `.innerHTML`.
+
+```js
+element.innerHTML = '<img src="foo.png" alt="``onload=alert(1)">';
+```
+
+Backticks are encoded as `&#96;` by this filter.  If a backtick is detected, and there is no whitespace, this filter will apend a single space character to force IE8 into quoting mode. 
+
+```js
+element.innerHTML = '<img src="foo.png" alt="&#96;&#96;onload=alert(1) ">';
+```
+
+For more info see https://cure53.de/fp170.pdf (sections 3.1 and 5.1, in
+particular) and https://www.hackinparis.com/talk-mario-heiderich .
+
 #### A Note About `<%= %>`
 
 You might be asking "Why provide `html(var)`? EJS already does HTML escaping!".
