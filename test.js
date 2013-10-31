@@ -26,47 +26,47 @@ var ALL_CASES = [
     html: '&amp;&amp;&#39;d',
     js: '&&amp;\\\'d',
     jsAttr: '&amp;&amp;\\&#39;d',
-    uri: '%26%26amp%3B%27d',
+    uri: '%26%26amp%3B%27d'
   },
   {
     input: '\' onload="alert(1)"',
     html: '&#39; onload=&quot;alert(1)&quot;',
     js: '\\\' onload=\\"alert(1)\\"',
     jsAttr: '\\&#39; onload=\\&quot;alert(1)\\&quot;',
-    uri: '%27%20onload%3D%22alert%281%29%22',
+    uri: '%27%20onload%3D%22alert%281%29%22'
   },
   {
     input: '<ha>, \'ha\', "ha"',
     html: '&lt;ha&gt;, &#39;ha&#39;, &quot;ha&quot;',
     js: '\\u003Cha\\u003E, \\\'ha\\\', \\"ha\\"',
     jsAttr: '&lt;ha&gt;, \\&#39;ha\\&#39;, \\&quot;ha\\&quot;',
-    uri: '%3Cha%3E%2C%20%27ha%27%2C%20%22ha%22',
+    uri: '%3Cha%3E%2C%20%27ha%27%2C%20%22ha%22'
   },
   {
     input: '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~', // punctuation in ASCII range (byte order)
     html: '!&quot;#$%&amp;&#39;()*+,-./:;&lt;=&gt;?@[\\]^_`{|}~',
     js: '!\\"#$%&\\\'()\\*+,-./:;\\u003C=\\u003E?@[\\\\]^_`{|}~',
     jsAttr: '!\\&quot;#$%&amp;\\&#39;()\\*+,-./:;&lt;=&gt;?@[\\\\]^_`{|}~',
-    uri: '%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E',
+    uri: '%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E'
   },
   {
     input: '%3Cscript%3E', // i.e., already uri-encoded
     html: '%3Cscript%3E',
     js: '%3Cscript%3E',
     jsAttr: '%3Cscript%3E',
-    uri: '%253Cscript%253E',
+    uri: '%253Cscript%253E'
   },
   {
     input: "é,ß,&☃ "+FACE_WITHOUT_MOUTH,
     html: "é,ß,&amp;☃ "+FACE_WITHOUT_MOUTH,
     js: "é,ß,&☃ "+FACE_WITHOUT_MOUTH,
     jsAttr: "é,ß,&amp;☃ "+FACE_WITHOUT_MOUTH,
-    uri: '%C3%A9%2C%C3%9F%2C%26%E2%98%83%20%F0%9F%98%B6',
+    uri: '%C3%A9%2C%C3%9F%2C%26%E2%98%83%20%F0%9F%98%B6'
   },
   {
     label: 'control characters',
     input: '\u0000,\u0001,\u0002...\u001F',
-    uri: '%00%2C%01%2C%02...%1F',
+    uri: '%00%2C%01%2C%02...%1F'
   },
 
   {
