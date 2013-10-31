@@ -180,11 +180,13 @@ secureFilters.js = function(val) {
         return '\\u00'+hex;
       case 3:
         return '\\u0'+hex;
-      default:
-        // Supplemental planes are usually encoded with 16-bit surrogate pairs.
-        // Technically, charCodeAt() JS doesn't return code > 0xFFFF, but using
-        // default protects against a buggy implementation.
+      case 4:
         return '\\u'+hex;
+      default:
+        // charCodeAt() JS shouldn't return code > 0xFFFF, and only four hex
+        // digits can be encoded via `\u`-encoding, so return REPLACEMENT
+        // CHARACTER U+FFFD.
+        return '\\uFFFD';
       }
     }
   });
