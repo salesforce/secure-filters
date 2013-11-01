@@ -19,7 +19,7 @@ secureFilters.constructor = function secureFilters(){};
  * See README.md for full documentation.
  */
 
-var TO_CONFIGURE = ['html','js','jsAttr','uri','jsObj'];
+var TO_CONFIGURE = ['html','js','jsAttr','uri','jsObj','css','style'];
 
 /**
  * Adds this module's filters to ejs.
@@ -65,6 +65,11 @@ var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
 // Matches alphanum plus allowable whitespace, ",._-", and unicode.
 // NO-BREAK SPACE U+00A0 is fine since it's "whitespace".
 var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
+
+// Matches alphanum and unicode. U+00A0 is ambiguously allowed as a "name" in
+// CSS (http://mathiasbynens.be/notes/css-escapes), so we don't whitelist it in
+// hopes that nobody actually uses it legitimately. This is consistent with ESAPI.
+var CSS_NOT_WHITELISTED = /[^a-zA-Z0-9\u00A1-\uFFFF]/g;
 
 /**
  * Encodes values for safe embedding in HTML tags and attributes.
@@ -211,6 +216,17 @@ secureFilters.jsObj = function(val) {
     .replace(CDATA_CLOSE, '\\x5D\\x5D\\x3E');
 };
 
+secureFilters.css = function(val) {
+  var str = String(val);
+  return str.replace(CSS_NOT_WHITELISTED, function(match) {
+    var hex = match.charCodeAt(0).toString(16).toLowerCase();
+    return '\\'+hex+' ';
+  });
+};
+
+secureFilters.style = function(val) {
+  return secureFilters.html(secureFilters.css(val));
+};
 
 // AMD / RequireJS
 if (typeof define !== 'undefined' && define.amd) {
