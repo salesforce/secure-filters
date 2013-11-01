@@ -155,7 +155,8 @@ compilation.  This allows `<%= %>` to be safer than [the
 default](#a-note-about--).
 
 ```js
-var templateFn = ejs.compile(template, { escape: secureFilters.html });
+var escapeHTML = secureFilters.html;
+var templateFn = ejs.compile(template, { escape: escapeHTML });
 ```
 
 ## As Normal Functions
