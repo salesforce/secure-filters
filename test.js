@@ -136,11 +136,12 @@ describe('exporting to EJS', function() {
     assert(ejs.filters);
     assert(ejs.filters instanceof Object);
     var keys = Object.keys(ejs.filters);
-    assert.equal(keys.length, 4);
+    assert.equal(keys.length, 5);
     assert('html' in ejs.filters);
     assert('js' in ejs.filters);
     assert('jsAttr' in ejs.filters);
     assert('uri' in ejs.filters);
+    assert('jsObj' in ejs.filters);
   }
 
   it('.configure()s an empty object', function() {

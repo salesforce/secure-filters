@@ -44,7 +44,7 @@ secureFilters.constructor = function secureFilters(){};
  */
 secureFilters.configure = function(ejs) {
   ejs.filters = ejs.filters || {};
-  ['html','js','jsAttr','uri'].forEach(function(filterName) {
+  ['html','js','jsAttr','uri','jsObj'].forEach(function(filterName) {
     ejs.filters[filterName] = secureFilters[filterName];
   });
   return ejs;
