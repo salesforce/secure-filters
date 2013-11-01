@@ -316,6 +316,10 @@ Confusingly, CSS allows `NO-BREAK SPACE` U+00A0 to be used in an identifier.
 Because of this confusion, it's possible browsers treat it as whitespace, and
 so `secure-filters` escapes it.
 
+Since [the behaviour of NUL in CSS2.1 is
+undefined](http://www.w3.org/TR/CSS21/syndata.html#characters), it is replaced
+with `\fffd `, `REPLACEMENT CHARACTER` U+FFFD.
+
 For example, the string `<wow>` becomes `\3c wow\3e ` (note the trailing space).
 
 ### style(value)

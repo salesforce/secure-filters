@@ -237,6 +237,10 @@ secureFilters.jsObj = function(val) {
  * is one one or more lowercase hexadecimal digits, including the trailing
  * space.
  *
+ * Since [the behaviour of NUL in CSS2.1 is
+ * undefined](http://www.w3.org/TR/CSS21/syndata.html#characters), it is
+ * replaced with `\fffd `, `REPLACEMENT CHARACTER` U+FFFD.
+ *
  * For example, the string `<wow>` becomes `\3c wow\3e ` (note the trailing space).
  *
  * @name css
@@ -246,8 +250,13 @@ secureFilters.jsObj = function(val) {
 secureFilters.css = function(val) {
   var str = String(val);
   return str.replace(CSS_NOT_WHITELISTED, function(match) {
-    var hex = match.charCodeAt(0).toString(16).toLowerCase();
-    return '\\'+hex+' ';
+    var code = match.charCodeAt(0);
+    if (code === 0) {
+      return '\\fffd '; // REPLACEMENT CHARACTER U+FFFD
+    } else {
+      var hex = code.toString(16).toLowerCase();
+      return '\\'+hex+' ';
+    }
   });
 };
 
