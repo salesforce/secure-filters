@@ -173,10 +173,10 @@ secureFilters.js = function(val) {
       }
     } else { // Unicode
       // XXX: with the current definition of JS_NOT_WHITELISTED this block is
-      // unused. The Block is left in so that if the regex changes Unicode
-      // characters are encoded correctly.  It's also possible that "illegal"
-      // chars in the 0x80-0xA0 range get passed in (e.g. CP-1251), in which
-      // case we still want to produce sanitary output.
+      // partially unused. U+00A0 is the only one that will hit this block.
+      // It's also possible that "illegal" chars in the 0x80-0xA0 range get
+      // passed in (e.g. CP-1251), in which case we still want to produce
+      // sanitary output.
       switch(hex.length) {
       case 2:
         return '\\u00'+hex;
