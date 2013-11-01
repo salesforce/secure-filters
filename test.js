@@ -277,12 +277,12 @@ var ALL_CASES = [
   {
     label: 'backticks in attribute',
     input: '``onload=xss()',
-    html: '&#96;&#96;onload=xss() ' // added trailing space
+    html: '&#96;&#96;onload&#61;xss&#40;&#41; ' // added trailing space
   },
   {
     label: 'backticks in attribute w/ space',
     input: '`` onload=xss()',
-    html: '&#96;&#96; onload=xss()' // no trailing space
+    html: '&#96;&#96; onload&#61;xss&#40;&#41;' // no trailing space
   }
 ];
 
