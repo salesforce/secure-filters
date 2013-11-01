@@ -141,7 +141,7 @@ Contexts:
 a `<script>` or `<style>` block (plus other blocks that cannot have
 entity-encoded characters).
 
-Any character not matched by `/[\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/` is
+Any character not matched by `/[\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/` is
 replaced with an HTML entity.  Additionally, characters matched by
 `/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/` are converted to spaces to avoid
 browser quirks that interpret these as non-characters.
