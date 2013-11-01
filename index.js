@@ -73,9 +73,11 @@ var JS_NOT_WHITELISTED = /[^,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/g;
 var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
 
 // Matches alphanum plus allowable whitespace, ",._-", and unicode.
-// XXX: the 00A1-FFFF range can't be modified without changes to the code; see
+// NO-BREAK SPACE U+00A0 is fine since it's "whitespace", unlike above in
+// JS_NOT_WHITELISTED where we want to encode whitespace.
+// XXX: the 00A0-FFFF range can't be modified without changes to the code; see
 // below.
-var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/g;
+var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
 
 /**
  * Encodes values for safe embedding in HTML tags and attributes.

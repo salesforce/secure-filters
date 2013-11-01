@@ -150,7 +150,14 @@ var ALL_CASES = [
     jsAttr: '&#92;x3C&#92;x21&#92;x5BCDATA&#92;x5B&#92;x20blah&#92;x20&#92;x5D&#92;x5D&#92;x3E',
     uri: '%3C%21%5BCDATA%5B%20blah%20%5D%5D%3E'
   },
-
+  {
+    label: 'nbsp',
+    input: '\u00A0',
+    html: '\u00A0', // un-encoded
+    js: '\\u00A0',
+    jsAttr: '&#92;u00A0',
+    uri: '%C2%A0'
+  },
   {
     label: 'README html example',
     input: '"><script>alert(\'pwn\')</script>',
