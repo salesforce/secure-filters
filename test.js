@@ -7,13 +7,16 @@
 
 var assert;
 var secureFilters;
+var _;
 
 if (typeof module !== 'undefined' && module.exports) {
   assert = require('gi-assert');
   secureFilters = require('./index');
+  _ = require('lodash');
 } else {
   assert = root.assert;
   secureFilters = root.secureFilters;
+  _ = root._;
 }
 
 // Test character inside the Unicode BMP:
@@ -230,11 +233,11 @@ var ALL_CASES = [
 
 
 describe('secure filters', function() {
-  ALL_CASES.forEach(function(c) {
+  _.each(ALL_CASES, function(c) {
     var input = c.input;
     var label = c.label || 'input "'+c.input+'"';
     describe('for '+label, function() {
-      Object.keys(c).forEach(function(filterName) {
+      _.each(c, function(expect, filterName) {
         if (filterName === 'input' || filterName === 'label') {
           return;
         }
@@ -242,8 +245,7 @@ describe('secure filters', function() {
         var func = secureFilters[filterName];
         assert(func);
         assert.strictEqual(typeof func, "function");
-        var expect = c[filterName];
-        it('filter '+filterName+' encodes correctly', function() {
+        it('filter '+filterName+' produces "'+expect+'"', function() {
           var output = func(input);
           assert.strictEqual(output, expect);
         });
@@ -256,7 +258,7 @@ describe('exporting to EJS', function() {
   function checkAllFilters(ejs) {
     assert(ejs.filters);
     assert(ejs.filters instanceof Object);
-    var keys = Object.keys(ejs.filters);
+    var keys = _.keys(ejs.filters);
     assert.equal(keys.length, 5);
     assert('html' in ejs.filters);
     assert('js' in ejs.filters);

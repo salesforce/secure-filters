@@ -1,0 +1,21 @@
+{
+  "name": "secure-filters",
+  "repo": "goinstant/secure-filters",
+  "version": "0.2.0",
+  "description": "Anti-XSS filters for security",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "security",
+    "xss",
+    "ejs",
+    "escape",
+    "encode"
+  ],
+  "paths": [],
+  "dependencies": {},
+  "development": [],
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}
