@@ -131,6 +131,9 @@ Available functions:
 - [`jsAttr(value)`](#jsattrvalue) - Sanitizes JavaScript string contexts _in an HTML attribute_
   using a combination of entity- and backslash-encoding.
 - [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
+- [`css(value)`](#cssvalue) - Sanitizes CSS contexts using backslash-encoding.
+- [`style(value)`](#stylevalue) - Sanitizes CSS contexts _in an HTML `style`
+  attribute_ using entity- and backslash-encoding.
 
 By convention in the Contexts below, `USERINPUT` should be replaced with the
 output of the filter function.
@@ -288,6 +291,46 @@ percent-encoded octets, where X is an uppercase hexidecimal digit.
 HTML-escaped before insertion into HTML. However, since Percent-encoding is
 also HTML-safe, it may be sufficient to just URI-encode the untrusted
 components if you know the rest is application-supplied.
+
+### css(value)
+
+Sanitizes output in CSS contexts by using backslash encoding.
+
+```html
+  <style type="text/css">
+    #user-USERINPUT {
+      background-color: #USERINPUT;
+    }
+  </style>
+```
+
+**CAUTION** this is not the correct filter for a `style=""` attribute; use
+the [`style(value)`](#stylevalue) filter instead!
+
+The ranges a-z, A-Z, 0-9 plus Unicode code points greater than or equal to
+U+00A1 are preserved.  All other characters are encoded as `\h `, where `h`
+is one one or more lowercase hexadecimal digits, including the trailing
+space.
+
+Confusingly, CSS allows `NO-BREAK SPACE` U+00A0 to be used in an identifier.
+Because of this confusion, it's possible browsers treat it as whitespace, and
+so `secure-filters` escapes it.
+
+For example, the string `<wow>` becomes `\3c wow\3e ` (note the trailing space).
+
+### style(value)
+
+Encodes values for safe embedding in HTML style attribute context.
+
+**USAGE**: all instances of `USERINPUT` should be sanitized by this function
+
+```html
+  <div style="background-color: #USERINPUT;"></div>
+```
+
+Encodes the value first as in the `css()` filter, then entity-encodes the result.
+
+For example, the string `<wow>` becomes `&#92;3c wow&#92;3e `.
 
 # Contributing
 

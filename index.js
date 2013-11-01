@@ -216,6 +216,33 @@ secureFilters.jsObj = function(val) {
     .replace(CDATA_CLOSE, '\\x5D\\x5D\\x3E');
 };
 
+/**
+ * Encodes values for safe embedding in CSS context.
+ *
+ * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
+ *
+ * ```html
+ *   <style type="text/css">
+ *     foo {
+ *       background-color: #USERINPUT;
+ *     }
+ *   </style>
+ * ```
+ *
+ * **CAUTION** this is not the correct filter for a `style=""` attribute; use
+ * the `style` filter instead!
+ *
+ * The ranges a-z, A-Z, 0-9 plus Unicode code points greater than or equal to
+ * U+00A1 are preserved.  All other characters are encoded as `\h `, where `h`
+ * is one one or more lowercase hexadecimal digits, including the trailing
+ * space.
+ *
+ * For example, the string `<wow>` becomes `\3c wow\3e ` (note the trailing space).
+ *
+ * @name css
+ * @param {any} val
+ * @return {string} the backslash-encoded string
+ */
 secureFilters.css = function(val) {
   var str = String(val);
   return str.replace(CSS_NOT_WHITELISTED, function(match) {
@@ -224,9 +251,27 @@ secureFilters.css = function(val) {
   });
 };
 
+/**
+ * Encodes values for safe embedding in HTML style attribute context.
+ *
+ * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
+ *
+ * ```html
+ *   <div style="background-color: #USERINPUT;"></div>
+ * ```
+ *
+ * Encodes the value first as in the `css()` filter, then entity-encodes the result.
+ *
+ * For example, the string `<wow>` becomes `&#92;3c wow&#92;3e `.
+ *
+ * @name style
+ * @param {any} val
+ * @return {string} the entity- and backslash-encoded string
+ */
 secureFilters.style = function(val) {
   return secureFilters.html(secureFilters.css(val));
 };
+
 
 // AMD / RequireJS
 if (typeof define !== 'undefined' && define.amd) {
