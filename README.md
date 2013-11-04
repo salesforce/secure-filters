@@ -199,9 +199,9 @@ assume that it's a bare int/float/boolean constant!
 :warning: **CAUTION**: this is not the correct encoding for the entire contents of a
 `<script>` block!  You need to sanitize each variable in-turn.
 
-Any character not matched by `/[,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/` is escaped as
-`\xHH` or `\uHHHH` where `H` is a hexidecimal digit. (Note that all unicode characters with
-3+ hex digits are matched).
+Any character not matched by `/[,\-\.0-9A-Z_a-z]/` is escaped as `\xHH` or
+`\uHHHH` where `H` is a hexidecimal digit.  The shorter `\x` form is used for
+charaters in the 7-bit ASCII range (i.e. code point <= 0x7F).
 
 ### jsObj(value)
 
@@ -213,19 +213,38 @@ Sanitizes output for a JavaScript literal in an HTML script context.
   </script>
 ```
 
-Specifically, this function encodes the object with `JSON.stringify()`, then
-replaces `<` with `\x3C` and `>` with `\x3E` to prevent breaking out of the
-surrounding script context.  The string `]]>` is encoded as `\x5D\x5D\x3E` to
-prevent breaking out of CDATA context.
+This function encodes the object with `JSON.stringify()`, then
+escapes certain characters.  Any character not matched by
+`/[",\-\.0-9:A-Z\[\\\]_a-z{}]/` is escaped consistent with the
+[`js(value)`](#jsvalue) escaping above. Additionally, the sub-string `]]>` is
+encoded as `\x5D\x5D\x3E` to prevent breaking out of CDATA context.
+
+Because `<` and `>` are not matched characters, they get encoded as `\x3C` and
+`\x3E`, respectively. This prevents breaking out of a surrounding HTML
+`<script>` context.
 
 For example, with a literal object like `{username:'Albert
-</script><script>alert("Pwnerton")'}`, gives output:
+</script><script>alert("Pwnerton")'}`, `jsObj()` gives output:
 
 ```html
   <script>
-    var config = {"username":"\x3C/script\x3E\x3Cscript\x3Ealert(\"Pwnerton\")"};
+    var config = {"username":"\x3C\x2Fscript\x3E\x3Cscript\x3Ealert\x28\"Pwnerton\"\x29"};
   </script>
 ```
+
+#### JSON is not a subset of JavaScript
+
+Article: [JSON isn't a JavaScript
+Subset](http://timelessrepo.com/json-isnt-a-javascript-subset).
+
+JSON is _almost_ a subset of JavaScript, but for two characters: [`LINE
+SEPARATOR` U+2028](http://www.fileformat.info/info/unicode/char/2028/index.htm)
+and [`PARAGRAPH SEPARATOR`
+U+2029](http://www.fileformat.info/info/unicode/char/2029/index.htm).  These
+two characters can't legally appear in JavaScript strings and must be escaped.
+Due to the ambiguity of these and other Unicode whitespace characters,
+`secure-filters` will backslash encode U+2028 as `\u2028`, U+2029 as `\u2029`,
+etc.
 
 ### jsAttr(value)
 
