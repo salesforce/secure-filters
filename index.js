@@ -54,18 +54,19 @@ secureFilters.configure = function(ejs) {
 
 var QUOT = /\x22/g; // "
 var APOS = /\x27/g; // '
-var LT = /</g;
-var GT = />/g;
 var AST = /\*/g;
 var TILDE = /~/g;
 var BANG = /!/g;
 var LPAREN = /\(/g;
 var RPAREN = /\)/g;
-var CDATA_CLOSE = /\]\]>/g;
+var CDATA_CLOSE = /\]\](?:>|\\x3E|\\u003E)/gi;
 
 // Matches alphanum plus ",._-" & unicode.
 // ESAPI doesn't consider "-" safe, but we do. It's both URI and HTML safe.
-var JS_NOT_WHITELISTED = /[^,\.0-9A-Z_a-z\-]/g;
+var JS_NOT_WHITELISTED = /[^,\-\.0-9A-Z_a-z]/g;
+
+// add on '":\[]{}', which are necessary JSON metacharacters
+var JSON_NOT_WHITELISTED = /[^\x22,\-\.0-9:A-Z\[\x5C\]_a-z{}]/g;
 
 // Control characters that get converted to spaces.
 var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
@@ -129,6 +130,36 @@ secureFilters.html = function(val) {
   });
 };
 
+function jsSlashEncoder(charStr) {
+  var code = charStr.charCodeAt(0);
+  var hex = code.toString(16).toUpperCase();
+  if (code < 0x80) { // ASCII
+    if (hex.length === 1) {
+      return '\\x0'+hex;
+    } else {
+      return '\\x'+hex;
+    }
+  } else { // Unicode
+    // It's also possible that "illegal" chars in the 0x80-0xA0 range get
+    // passed in (e.g. CP-1251), in which case we still want to produce
+    // sanitary output.
+    switch(hex.length) {
+      case 2:
+        return '\\u00'+hex;
+      case 3:
+        return '\\u0'+hex;
+      case 4:
+        return '\\u'+hex;
+      default:
+        // charCodeAt() JS shouldn't return code > 0xFFFF, and only four hex
+        // digits can be encoded via `\u`-encoding, so return REPLACEMENT
+        // CHARACTER U+FFFD.
+        return '\\uFFFD';
+    }
+  }
+
+}
+
 /**
  * Encodes values for safe embedding in JavaScript string contexts.
  *
@@ -160,34 +191,7 @@ secureFilters.html = function(val) {
  */
 secureFilters.js = function(val) {
   var str = String(val);
-  return str.replace(JS_NOT_WHITELISTED, function(match) {
-    var code = match.charCodeAt(0);
-    var hex = code.toString(16).toUpperCase();
-    if (code < 0x80) { // ASCII
-      if (hex.length === 1) {
-        return '\\x0'+hex;
-      } else {
-        return '\\x'+hex;
-      }
-    } else { // Unicode
-      // It's also possible that "illegal" chars in the 0x80-0xA0 range get
-      // passed in (e.g. CP-1251), in which case we still want to produce
-      // sanitary output.
-      switch(hex.length) {
-      case 2:
-        return '\\u00'+hex;
-      case 3:
-        return '\\u0'+hex;
-      case 4:
-        return '\\u'+hex;
-      default:
-        // charCodeAt() JS shouldn't return code > 0xFFFF, and only four hex
-        // digits can be encoded via `\u`-encoding, so return REPLACEMENT
-        // CHARACTER U+FFFD.
-        return '\\uFFFD';
-      }
-    }
-  });
+  return str.replace(JS_NOT_WHITELISTED, jsSlashEncoder);
 };
 
 
@@ -281,12 +285,10 @@ secureFilters.uri = function(val) {
  */
 secureFilters.jsObj = function(val) {
   return JSON.stringify(val)
+    .replace(JSON_NOT_WHITELISTED, jsSlashEncoder)
     // prevent breaking out of CDATA context.  Escaping < below is sufficient
     // to prevent opening a CDATA context.
-    .replace(CDATA_CLOSE, '\\x5D\\x5D\\x3E')
-    // prevent breaking out of <script> context
-    .replace(LT, '\\x3C')
-    .replace(GT, '\\x3E');
+    .replace(CDATA_CLOSE, '\\x5D\\x5D\\x3E');
 };
 
 

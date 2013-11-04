@@ -199,17 +199,27 @@ var ALL_CASES = [
   {
     label: 'object literal',
     input: {key:"</script><script>alert(\"hah!\")"},
-    jsObj: '{"key":"\\x3C/script\\x3E\\x3Cscript\\x3Ealert(\\"hah!\\")"}'
+    jsObj: '{"key":"\\x3C\\x2Fscript\\x3E\\x3Cscript\\x3Ealert\\x28\\"hah\\x21\\"\\x29"}'
+  },
+  {
+    label: 'object literal w/ unicode',
+    input: {key:"snowman:"+SNOWMAN},
+    jsObj: '{"key":"snowman:\\u2603"}'
+  },
+  {
+    label: 'object w/ LINE SEPARATOR U+2028 and PARAGRAPH SEPARATOR U+2029',
+    input: {"line\u2028sep":"para\u2029sep"},
+    jsObj: '{"line\\u2028sep":"para\\u2029sep"}'
   },
   {
     label: 'array literal',
     input: [1,2.3,"ouch",'</script><script>alert(\"hah!\")'],
-    jsObj: '[1,2.3,"ouch","\\x3C/script\\x3E\\x3Cscript\\x3Ealert(\\"hah!\\")"]'
+    jsObj: '[1,2.3,"ouch","\\x3C\\x2Fscript\\x3E\\x3Cscript\\x3Ealert\\x28\\"hah\\x21\\"\\x29"]'
   },
   {
     label: 'CDATA in object',
     input: {"open":"<![CDATA[", "close": "]]>"},
-    jsObj: '{"open":"\\x3C![CDATA[","close":"\\x5D\\x5D\\x3E"}'
+    jsObj: '{"open":"\\x3C\\x21[CDATA[","close":"\\x5D\\x5D\\x3E"}'
   },
   {
     label: "nested array doesn't trigger CDATA protection",
