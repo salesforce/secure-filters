@@ -65,9 +65,7 @@ var CDATA_CLOSE = /\]\]>/g;
 
 // Matches alphanum plus ",._-" & unicode.
 // ESAPI doesn't consider "-" safe, but we do. It's both URI and HTML safe.
-// XXX: the 00A1-FFFF range can't be modified without changes to the code; see
-// below.
-var JS_NOT_WHITELISTED = /[^,\.0-9A-Z_a-z\-\u00A1-\uFFFF]/g;
+var JS_NOT_WHITELISTED = /[^,\.0-9A-Z_a-z\-]/g;
 
 // Control characters that get converted to spaces.
 var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
@@ -172,8 +170,6 @@ secureFilters.js = function(val) {
         return '\\x'+hex;
       }
     } else { // Unicode
-      // XXX: with the current definition of JS_NOT_WHITELISTED this block is
-      // partially unused. U+00A0 is the only one that will hit this block.
       // It's also possible that "illegal" chars in the 0x80-0xA0 range get
       // passed in (e.g. CP-1251), in which case we still want to produce
       // sanitary output.
