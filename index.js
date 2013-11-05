@@ -72,8 +72,7 @@ var JSON_NOT_WHITELISTED = /[^\x22,\-\.0-9:A-Z\[\x5C\]_a-z{}]/g;
 var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
 
 // Matches alphanum plus allowable whitespace, ",._-", and unicode.
-// NO-BREAK SPACE U+00A0 is fine since it's "whitespace", unlike above in
-// JS_NOT_WHITELISTED where we want to encode whitespace.
+// NO-BREAK SPACE U+00A0 is fine since it's "whitespace".
 // XXX: the 00A0-FFFF range can't be modified without changes to the code; see
 // below.
 var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
@@ -275,9 +274,8 @@ secureFilters.uri = function(val) {
  * No special processing is required to parse the resulting JSON object.
  *
  * Specifically, this function encodes the object with `JSON.stringify()`, then
- * replaces `<>` with `\x3C` and `\x3E`, respectively, to prevent breaking
- * out of the surrounding script context.  `]]>` is converted to `\x5D\x5D\x3E` to
- * prevent breaking out of a CDATA context.
+ * runs the result through the `js()` backslash-encoder.  Additionally, `]]>`
+ * is converted to `\x5D\x5D\x3E` to prevent breaking out of a CDATA context.
  *
  * @name jsObj
  * @param {any} val
