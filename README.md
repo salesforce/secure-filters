@@ -23,8 +23,9 @@ You can roll your own input validation or you can use an existing module.  Eithe
 [important](https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security)
 [rules](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet) to follow.
 
-http://stackoverflow.com/questions/4088723/validation-library-for-node-js lists
-several input validation options specific to node.js.
+[This Stack-Overflow
+thread](http://stackoverflow.com/questions/4088723/validation-library-for-node-js)
+lists several input validation options specific to node.js.
 
 One of those options is node-validator ([NPM](https://npmjs.org/package/validator),
 [github](https://github.com/chriso/node-validator)).
@@ -41,6 +42,12 @@ node.js server.
 # Usage
 
 `secure-filters` can be used with EJS or as normal functions.
+
+:warning: **CAUTION**: If the `Content-Type` HTTP header for your document, or
+the `<meta charset="">` tag (or eqivalent) specifies a non-UTF-8 encoding these
+filters _may not provide adequate protection_! Some browsers can treat some
+characters at Unicode code-points `0x00A0` and above as if they were `<` if the
+encoding is not set to UTF-8!
 
 ## With EJS
 
@@ -164,7 +171,8 @@ When given user input `x' onerror='alert(1)`, the above gets rendered as:
   <img src='x' onerror='alert(1)'>
 ```
 
-Which will cause the `onerror` javascript to run.  Using this module's filter should prevent this.
+Which will cause the `onerror` javascript to run.  Using this module's filter
+should prevent this.
 
 ```html
   <img src='<%-: prefs.avatar |html%>'>
@@ -255,7 +263,9 @@ combination of backslash- and entity-encoding.
   <a href="javascript:doActivate('USERINPUT')">click to activate</a>
 ```
 
-The string `<ha>, 'ha', "ha"` is escaped to `&lt;ha&gt;, \&#39;ha\&#39;, \&quot;ha\&quot;`. Note the backslashes before the apostrophe and quote entities.
+The string `<ha>, 'ha', "ha"` is escaped to `&lt;ha&gt;, \&#39;ha\&#39;,
+\&quot;ha\&quot;`. Note the backslashes before the apostrophe and quote
+entities.
 
 ### uri(value)
 

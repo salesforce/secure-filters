@@ -73,8 +73,6 @@ var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
 
 // Matches alphanum plus allowable whitespace, ",._-", and unicode.
 // NO-BREAK SPACE U+00A0 is fine since it's "whitespace".
-// XXX: the 00A0-FFFF range can't be modified without changes to the code; see
-// below.
 var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
 
 /**
@@ -139,9 +137,6 @@ function jsSlashEncoder(charStr) {
       return '\\x'+hex;
     }
   } else { // Unicode
-    // It's also possible that "illegal" chars in the 0x80-0xA0 range get
-    // passed in (e.g. CP-1251), in which case we still want to produce
-    // sanitary output.
     switch(hex.length) {
       case 2:
         return '\\u00'+hex;
