@@ -214,7 +214,7 @@ secureFilters.jsObj = function(val) {
 
 // AMD / RequireJS
 if (typeof define !== 'undefined' && define.amd) {
-  define('secure-filters', [], function () {
+  define([], function () {
     return secureFilters;
   });
 }
