@@ -261,6 +261,7 @@ combination of backslash- and entity-encoding.
 
 ```html
   <a href="javascript:doActivate('USERINPUT')">click to activate</a>
+  <button onclick="display('USERINPUT')">Click To Display</button>
 ```
 
 The string `<ha>, 'ha', "ha"` is escaped to `&lt;ha&gt;, \&#39;ha\&#39;,

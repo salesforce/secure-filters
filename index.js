@@ -196,6 +196,7 @@ secureFilters.js = function(val) {
  *
  * ```html
  *   <a href="javascript:doActivate('USERINPUT')">click to activate</a>
+ *   <button onclick="display('USERINPUT')">Click To Display</button>
  * ```
  *
  * This is a combination of backslash-encoding and entity-encoding. It
