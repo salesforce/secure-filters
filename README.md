@@ -10,8 +10,9 @@ for 2013, as determined by a broad consensus among
 [OWASP](https://www.owasp.org) members.
 
 To effectively combat XSS, you must combine input validation with output
-sanitization. This module aims to provide only output sanitization since there
-are plenty of JavaScript modules out there to do the validation part.
+sanitization.  **Using one or the other is not sufficient; you must apply
+both!** This module aims to provide only output sanitization since there are
+plenty of JavaScript modules out there to do the validation part.
 
 Whichever input validation and output sanitization modules you end up using,
 please review the code carefully and apply your own professional paranoia.
@@ -19,7 +20,8 @@ Trust, but verify.
 
 ### Input Validation
 
-You can roll your own input validation or you can use an existing module.  Either way, there are
+You can roll your own input validation or you can use an existing module.
+Either way, there are
 [many](https://owasp.org/index.php/Data_Validation)
 [important](https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security)
 [rules](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet) to follow.
@@ -131,6 +133,9 @@ Available functions:
 - [`jsAttr(value)`](#jsattrvalue) - Sanitizes JavaScript string contexts _in an HTML attribute_
   using a combination of entity- and backslash-encoding.
 - [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
+- [`css(value)`](#cssvalue) - Sanitizes CSS contexts using backslash-encoding.
+- [`style(value)`](#stylevalue) - Sanitizes CSS contexts _in an HTML `style`
+  attribute_ using entity- and backslash-encoding.
 
 By convention in the Contexts below, `USERINPUT` should be replaced with the
 output of the filter function.
@@ -288,6 +293,63 @@ percent-encoded octets, where X is an uppercase hexidecimal digit.
 HTML-escaped before insertion into HTML. However, since Percent-encoding is
 also HTML-safe, it may be sufficient to just URI-encode the untrusted
 components if you know the rest is application-supplied.
+
+### css(value)
+
+Sanitizes output in CSS contexts by using backslash encoding.
+
+```html
+  <style type="text/css">
+    #user-USERINPUT {
+      background-color: #USERINPUT;
+    }
+  </style>
+```
+
+:warning: **CAUTION** this is not the correct filter for a `style=""` attribute; use
+the [`style(value)`](#stylevalue) filter instead!
+
+:warning: **CAUTION** even though this module prevents breaking out of CSS
+context, it is still somewhat risky to allow user-controlled input into CSS and
+`<style>` blocks. Be sure to combine CSS escaping with whitelist-based input
+sanitization! Here's a small sampling of what's possible:
+
+- https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability
+- http://html5sec.org/#43 - note the modern browser versions!
+
+
+The ranges a-z, A-Z, 0-9 plus Unicode U+10000 and higher are preserved.  All
+other characters are encoded as `\h `, where `h` is one one or more lowercase
+hexadecimal digits, including the trailing space.
+
+Confusingly, CSS allows `NO-BREAK SPACE` U+00A0 to be used in an identifier.
+Because of this confusion, it's possible browsers treat it as whitespace, and
+so `secure-filters` escapes it.
+
+Since [the behaviour of NUL in CSS2.1 is
+undefined](http://www.w3.org/TR/CSS21/syndata.html#characters), it is replaced
+with `\fffd `, `REPLACEMENT CHARACTER` U+FFFD.
+
+For example, the string `<wow>` becomes `\3c wow\3e ` (note the trailing space).
+
+### style(value)
+
+Encodes values for safe embedding in HTML style attribute context.
+
+**USAGE**: all instances of `USERINPUT` should be sanitized by this function
+
+```html
+  <div style="background-color: #USERINPUT;"></div>
+```
+
+:warning: **CAUTION** even though this module prevents breaking out of style-attribute
+context, it is still somewhat risky to allow user-controlled input (see caveats
+on [css](#cssvalue) above).  Be sure to combine with whitelist-based input
+sanitization!
+
+Encodes the value first as in the `css()` filter, then HTML entity-encodes the result.
+
+For example, the string `<wow>` becomes `&#92;3c wow&#92;3e `.
 
 # Contributing
 
