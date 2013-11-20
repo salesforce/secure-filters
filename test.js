@@ -170,7 +170,7 @@ var ALL_CASES = [
   },
   {
     input: "é, ß, "+SNOWMAN+", "+FACE_WITHOUT_MOUTH,
-    html: "é, ß, "+SNOWMAN+", "+FACE_WITHOUT_MOUTH,
+    html: "&#xE9;, &#xDF;, &#x2603;, "+FACE_WITHOUT_MOUTH,
     js: "\\u00E9,\\x20\\u00DF,\\x20\\u2603,\\x20\\uD83D\\uDE36",
     jsAttr: "&#92;u00E9,&#92;x20&#92;u00DF,&#92;x20&#92;u2603,&#92;x20&#92;uD83D&#92;uDE36",
     uri: '%C3%A9%2C%20%C3%9F%2C%20%E2%98%83%2C%20%F0%9F%98%B6',
