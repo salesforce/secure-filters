@@ -4,12 +4,12 @@
   "description": "Anti-XSS filters for security",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js && mocha-phantomjs static/test.html"
+    "test": "mocha test.js && mocha-phantomjs -R dot static/test.html"
   },
   "homepage": "https://github.com/goinstant/secure-filters",
   "repository": "git@github.com:goinstant/secure-filters.git",
   "author": "GoInstant Inc., a salesforce.com company",
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "engines": {
     "node": ">= 0.10.0"
   },
@@ -24,6 +24,7 @@
     "gi-assert": "git://github.com/goinstant/assert.git#v1.0.0",
     "mocha": "1.8.2",
     "mocha-phantomjs": "2.0.2",
-    "lodash": "1.3.1"
+    "lodash": "1.3.1",
+    "component": "0.18.0"
   }
 }

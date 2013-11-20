@@ -15,6 +15,7 @@ are plenty of JavaScript modules out there to do the validation part.
 
 Whichever input validation and output sanitization modules you end up using,
 please review the code carefully and apply your own professional paranoia.
+Trust, but verify.
 
 ### Input Validation
 

@@ -19,17 +19,27 @@ secureFilters.constructor = function secureFilters(){};
  * See README.md for full documentation.
  */
 
+var TO_CONFIGURE = ['html','js','jsAttr','uri','jsObj'];
+
 /**
  * Adds this module's filters to ejs.
+ *
+ * **USAGE**:
+ *
+ * ```js
+ *   var secureFilters = require('secure-filters');
+ *   var ejs = secureFilters.configure(require('ejs'));
+ * ```
  *
  * @param {Object} ejs the EJS package object
  * @return {Object} the same EJS object
  */
 secureFilters.configure = function(ejs) {
   ejs.filters = ejs.filters || {};
-  ['html','js','jsAttr','uri','jsObj'].forEach(function(filterName) {
+  for (var i = 0; i < TO_CONFIGURE.length; i++) {
+    var filterName = TO_CONFIGURE[i];
     ejs.filters[filterName] = secureFilters[filterName];
-  });
+  }
   return ejs;
 };
 
