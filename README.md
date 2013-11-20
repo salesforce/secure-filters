@@ -23,8 +23,9 @@ You can roll your own input validation or you can use an existing module.  Eithe
 [important](https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security)
 [rules](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet) to follow.
 
-http://stackoverflow.com/questions/4088723/validation-library-for-node-js lists
-several input validation options specific to node.js.
+[This Stack-Overflow
+thread](http://stackoverflow.com/questions/4088723/validation-library-for-node-js)
+lists several input validation options specific to node.js.
 
 One of those options is node-validator ([NPM](https://npmjs.org/package/validator),
 [github](https://github.com/chriso/node-validator)).
@@ -41,6 +42,12 @@ node.js server.
 # Usage
 
 `secure-filters` can be used with EJS or as normal functions.
+
+:warning: **CAUTION**: If the `Content-Type` HTTP header for your document, or
+the `<meta charset="">` tag (or eqivalent) specifies a non-UTF-8 encoding these
+filters _may not provide adequate protection_! Some browsers can treat some
+characters at Unicode code-points `0x00A0` and above as if they were `<` if the
+encoding is not set to UTF-8!
 
 ## With EJS
 
@@ -107,7 +114,7 @@ The filter functions are just regular functions and can be used outside of EJS.
   var htmlEscape = require('secure-filters').html;
   var escaped = htmlEscape('"><script>alert(\'pwn\')</script>');
   assert.equal(escaped,
-    '&quot;&gt;&lt;script&gt;alert(&#39;pwn&#39;)&lt;script&gt;');
+    '&quot;&gt;&lt;script&gt;alert&#40;&#39;pwn&#39;&#41;&lt;&#47;script&gt;');
 ```
 
 # Functions
@@ -141,7 +148,10 @@ Contexts:
 a `<script>` or `<style>` block (plus other blocks that cannot have
 entity-encoded characters).
 
-Avoids double-encoding `&quot;`, `&#39;`, `&lt;`, and `&gt;`.
+Any character not matched by `/[\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/` is
+replaced with an HTML entity.  Additionally, characters matched by
+`/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/` are converted to spaces to avoid
+browser quirks that interpret these as non-characters.
 
 #### A Note About `<%= %>`
 
@@ -161,7 +171,8 @@ When given user input `x' onerror='alert(1)`, the above gets rendered as:
   <img src='x' onerror='alert(1)'>
 ```
 
-Which will cause the `onerror` javascript to run.  Using this module's filter should prevent this.
+Which will cause the `onerror` javascript to run.  Using this module's filter
+should prevent this.
 
 ```html
   <img src='<%-: prefs.avatar |html%>'>
@@ -170,7 +181,7 @@ Which will cause the `onerror` javascript to run.  Using this module's filter sh
 When given user input `x' onerror='alert(1)`, the above gets rendered as:
 
 ```html
-  <img src='x&#39; onerror=&#39;alert(1)'>
+  <img src='x&#39; onerror&#61;&#39;alert&#40;1&#41;'>
 ```
 
 Which will not run the attacking script.
@@ -190,14 +201,15 @@ Sanitizes output for JavaScript _string_ contexts using backslash-encoding.
   </script>
 ```
 
-The `<` and `>` characters are encoded as `\u003C` and `\u003E`, respectively.
-This prevents breaking out of a surrounding `<script>` context.
-
 :warning: **CAUTION**: you need to always put quotes around the embedded value; don't
 assume that it's a bare int/float/boolean constant!
 
 :warning: **CAUTION**: this is not the correct encoding for the entire contents of a
 `<script>` block!  You need to sanitize each variable in-turn.
+
+Any character not matched by `/[,\-\.0-9A-Z_a-z]/` is escaped as `\xHH` or
+`\uHHHH` where `H` is a hexidecimal digit.  The shorter `\x` form is used for
+charaters in the 7-bit ASCII range (i.e. code point <= 0x7F).
 
 ### jsObj(value)
 
@@ -209,18 +221,38 @@ Sanitizes output for a JavaScript literal in an HTML script context.
   </script>
 ```
 
-Specifically, this function encodes the object with `JSON.stringify()`, then
-replaces `<` with `\u003C` and `>` with `\u003E` to prevent breaking
-out of the surrounding script context.
+This function encodes the object with `JSON.stringify()`, then
+escapes certain characters.  Any character not matched by
+`/[",\-\.0-9:A-Z\[\\\]_a-z{}]/` is escaped consistent with the
+[`js(value)`](#jsvalue) escaping above. Additionally, the sub-string `]]>` is
+encoded as `\x5D\x5D\x3E` to prevent breaking out of CDATA context.
+
+Because `<` and `>` are not matched characters, they get encoded as `\x3C` and
+`\x3E`, respectively. This prevents breaking out of a surrounding HTML
+`<script>` context.
 
 For example, with a literal object like `{username:'Albert
-</script><script>alert("Pwnerton")'}`, gives output:
+</script><script>alert("Pwnerton")'}`, `jsObj()` gives output:
 
 ```html
   <script>
-    var config = {"username":"\u003C/script\u003E\u003Cscript\u003Ealert(\"Pwnerton\")"};
+    var config = {"username":"\x3C\x2Fscript\x3E\x3Cscript\x3Ealert\x28\"Pwnerton\"\x29"};
   </script>
 ```
+
+#### JSON is not a subset of JavaScript
+
+Article: [JSON isn't a JavaScript
+Subset](http://timelessrepo.com/json-isnt-a-javascript-subset).
+
+JSON is _almost_ a subset of JavaScript, but for two characters: [`LINE
+SEPARATOR` U+2028](http://www.fileformat.info/info/unicode/char/2028/index.htm)
+and [`PARAGRAPH SEPARATOR`
+U+2029](http://www.fileformat.info/info/unicode/char/2029/index.htm).  These
+two characters can't legally appear in JavaScript strings and must be escaped.
+Due to the ambiguity of these and other Unicode whitespace characters,
+`secure-filters` will backslash encode U+2028 as `\u2028`, U+2029 as `\u2029`,
+etc.
 
 ### jsAttr(value)
 
@@ -229,9 +261,12 @@ combination of backslash- and entity-encoding.
 
 ```html
   <a href="javascript:doActivate('USERINPUT')">click to activate</a>
+  <button onclick="display('USERINPUT')">Click To Display</button>
 ```
 
-The string `<ha>, 'ha', "ha"` is escaped to `&lt;ha&gt;, \&#39;ha\&#39;, \&quot;ha\&quot;`. Note the backslashes before the apostrophe and quote entities.
+The string `<ha>, 'ha', "ha"` is escaped to `&lt;ha&gt;, \&#39;ha\&#39;,
+\&quot;ha\&quot;`. Note the backslashes before the apostrophe and quote
+entities.
 
 ### uri(value)
 

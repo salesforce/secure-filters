@@ -26,6 +26,8 @@ secureFilters.constructor = function secureFilters(){};
  * - `js()` - Sanitizes JavaScript string contexts using backslash-encoding.
  * - `jsAttr()` - Sanitizes JavaScript string contexts _in an HTML attribute_
  *   using a combination of entity- and backslash-encoding.
+ * - `jsObj()` - Sanitizes JavaScript objects for inclusion in HTML-script
+ *   context.
  * - `uri()` - Sanitizes URI contexts using percent-encoding.
  */
 
@@ -50,17 +52,28 @@ secureFilters.configure = function(ejs) {
   return ejs;
 };
 
-var AMP_NO_DOUBLE = /&(?!(?:amp|quot|#39|lt|gt);)/g;
-var QUOT = /\"/g;
-var APOS = /\'/g;
-var LT = /</g;
-var GT = />/g;
-var BS = /\\/g;
+var QUOT = /\x22/g; // "
+var APOS = /\x27/g; // '
 var AST = /\*/g;
 var TILDE = /~/g;
 var BANG = /!/g;
 var LPAREN = /\(/g;
 var RPAREN = /\)/g;
+var CDATA_CLOSE = /\]\](?:>|\\x3E|\\u003E)/gi;
+
+// Matches alphanum plus ",._-" & unicode.
+// ESAPI doesn't consider "-" safe, but we do. It's both URI and HTML safe.
+var JS_NOT_WHITELISTED = /[^,\-\.0-9A-Z_a-z]/g;
+
+// add on '":\[]{}', which are necessary JSON metacharacters
+var JSON_NOT_WHITELISTED = /[^\x22,\-\.0-9:A-Z\[\x5C\]_a-z{}]/g;
+
+// Control characters that get converted to spaces.
+var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
+
+// Matches alphanum plus allowable whitespace, ",._-", and unicode.
+// NO-BREAK SPACE U+00A0 is fine since it's "whitespace".
+var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
 
 /**
  * Encodes values for safe embedding in HTML tags and attributes.
@@ -77,22 +90,69 @@ var RPAREN = /\)/g;
  * a `<script>` or `<style>` block (plus other blocks that cannot have
  * entity-encoded characters).
  *
- * Avoids double-encoding `&quot;`, `&#39;`, `&lt;`, and `&gt;`.
- *
  * @name html
  * @param {any} val will be converted to a String prior to encoding
  * @return {string} the encoded string
  */
 secureFilters.html = function(val) {
-  return String(val)
-    // & not followed by certain entities:
-    .replace(AMP_NO_DOUBLE, '&amp;')
-    // then, after we've replaced &, get the rest:
-    .replace(QUOT, '&quot;')
-    .replace(APOS, '&#39;')
-    .replace(LT, '&lt;')
-    .replace(GT, '&gt;');
+  var str = String(val);
+  str = str.replace(HTML_CONTROL, ' ');
+  return str.replace(HTML_NOT_WHITELISTED, function(match) {
+    var code = match.charCodeAt(0);
+    switch(code) {
+    // folks expect these "nice" entities:
+    case 0x22:
+      return '&quot;';
+    case 0x26:
+      return '&amp;';
+    case 0x3C:
+      return '&lt;';
+    case 0x3E:
+      return '&gt;';
+
+    default:
+      // optimize for size:
+      if (code < 100) {
+        var dec = code.toString(10);
+        return '&#'+dec+';';
+      } else {
+        // XXX: this doesn't produce strictly valid entities for code-points
+        // requiring a UTF-16 surrogate pair. However, browsers are generally
+        // tolerant of this. Surrogate pairs are currently in the whitelist
+        // defined via HTML_NOT_WHITELISTED.
+        var hex = code.toString(16).toUpperCase();
+        return '&#x'+hex+';';
+      }
+    }
+  });
 };
+
+function jsSlashEncoder(charStr) {
+  var code = charStr.charCodeAt(0);
+  var hex = code.toString(16).toUpperCase();
+  if (code < 0x80) { // ASCII
+    if (hex.length === 1) {
+      return '\\x0'+hex;
+    } else {
+      return '\\x'+hex;
+    }
+  } else { // Unicode
+    switch(hex.length) {
+      case 2:
+        return '\\u00'+hex;
+      case 3:
+        return '\\u0'+hex;
+      case 4:
+        return '\\u'+hex;
+      default:
+        // charCodeAt() JS shouldn't return code > 0xFFFF, and only four hex
+        // digits can be encoded via `\u`-encoding, so return REPLACEMENT
+        // CHARACTER U+FFFD.
+        return '\\uFFFD';
+    }
+  }
+
+}
 
 /**
  * Encodes values for safe embedding in JavaScript string contexts.
@@ -109,6 +169,10 @@ secureFilters.html = function(val) {
  *   </script>
  * ```
  *
+ * Any character that's not alphanumeric or `,-._` will be backslash encoded as
+ * `\xHH`. U+00A0 and higher are encoded as `\uHHHH` instead. `H` is a
+ * hexadecimal digit.
+ *
  * **CAUTION**: you need to always put quotes around the embedded value; don't
  * assume that it's an int/float/boolean bare constant!
  *
@@ -120,15 +184,8 @@ secureFilters.html = function(val) {
  * @return {string} the encoded string
  */
 secureFilters.js = function(val) {
-  return String(val)
-    .replace(BS, '\\\\') // double-backslash.  Must happen first.
-    .replace(AST, '\\*')
-    .replace(QUOT, '\\"')
-    .replace(APOS, "\\'")
-    // < and > need unicode escaping to avoid the string '<script>' from
-    // breaking out of the surrounding script context.
-    .replace(LT, '\\u003C')
-    .replace(GT, '\\u003E');
+  var str = String(val);
+  return str.replace(JS_NOT_WHITELISTED, jsSlashEncoder);
 };
 
 
@@ -139,6 +196,7 @@ secureFilters.js = function(val) {
  *
  * ```html
  *   <a href="javascript:doActivate('USERINPUT')">click to activate</a>
+ *   <button onclick="display('USERINPUT')">Click To Display</button>
  * ```
  *
  * This is a combination of backslash-encoding and entity-encoding. It
@@ -147,7 +205,7 @@ secureFilters.js = function(val) {
  * For example, the string
  * `<ha>, 'ha', "ha"`
  * is escaped to
- * `&lt;ha&gt;, \&#39;ha\&#39;, \&quot;ha\&quot;`
+ * `\x3Cha\x3E, \&#39;ha\&#39;, \&quot;ha\&quot;`
  *
  * Note the backslashes before the apostrophe and quote entities.
  *
@@ -156,26 +214,7 @@ secureFilters.js = function(val) {
  * @return {string} the encoded string
  */
 secureFilters.jsAttr = function(val) {
-  return String(val)
-    // & just needs HTML-escaping
-    .replace(AMP_NO_DOUBLE, '&amp;')
-
-    // HTML-escape literal " and '
-    .replace(QUOT, "&quot;")
-    .replace(APOS, "&#39;")
-
-    .replace(BS, '\\\\') // Must happen before other backslash-escaping
-    .replace(AST, '\\*')
-
-    // Double-up HTML- and JS-escape quot and apos to prevent recursive
-    // breakout. Happens after escaping literal " and ' above so we can
-    // JS-escape all instances of the entities.
-    .replace(/\&quot;/g, '\\&quot;')
-    .replace(/\&#39;/g, '\\&#39;')
-
-    // < and > are only HTML-escaped
-    .replace(LT, '&lt;')
-    .replace(GT, '&gt;');
+  return secureFilters.html(secureFilters.js(val));
 };
 
 /**
@@ -202,10 +241,13 @@ secureFilters.jsAttr = function(val) {
  * @return {string} the percent-encoded string
  */
 secureFilters.uri = function(val) {
-  // "encodeURIComponent() will not encode ~!*()'"
+  // encodeURIComponent() is well-standardized across browsers and it handles
+  // UTF-8 natively.  It will not encode "~!*()'", so need to replace those here.
+  // encodeURIComponent also won't encode ".-_", but those are known-safe.
   var encode = encodeURIComponent(String(val));
   return encode
     .replace(BANG, '%21')
+    .replace(QUOT, '%27')
     .replace(APOS, '%27')
     .replace(LPAREN, '%28')
     .replace(RPAREN, '%29')
@@ -228,8 +270,8 @@ secureFilters.uri = function(val) {
  * No special processing is required to parse the resulting JSON object.
  *
  * Specifically, this function encodes the object with `JSON.stringify()`, then
- * replaces `<>` with `\u003C` and `\u003E`, respectively, to prevent breaking
- * out of the surrounding script context.
+ * runs the result through the `js()` backslash-encoder.  Additionally, `]]>`
+ * is converted to `\x5D\x5D\x3E` to prevent breaking out of a CDATA context.
  *
  * @name jsObj
  * @param {any} val
@@ -237,8 +279,10 @@ secureFilters.uri = function(val) {
  */
 secureFilters.jsObj = function(val) {
   return JSON.stringify(val)
-    .replace(LT, '\\u003C')
-    .replace(GT, '\\u003E');
+    .replace(JSON_NOT_WHITELISTED, jsSlashEncoder)
+    // prevent breaking out of CDATA context.  Escaping < below is sufficient
+    // to prevent opening a CDATA context.
+    .replace(CDATA_CLOSE, '\\x5D\\x5D\\x3E');
 };
 
 
