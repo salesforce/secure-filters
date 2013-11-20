@@ -311,9 +311,12 @@ the [`style(value)`](#stylevalue) filter instead!
 
 :warning: **CAUTION** even though this module prevents breaking out of CSS
 context, it is still somewhat risky to allow user-controlled input into CSS and
-`<style>` blocks.  For example, consider that `font-face` can be used to load
-SVG fonts and that [SVG exploits are possible](https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability).
-Be sure to combine with whitelist-based input sanitization!
+`<style>` blocks. Be sure to combine CSS escaping with whitelist-based input
+sanitization! Here's a small sampling of what's possible:
+
+- https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability
+- http://html5sec.org/#43 - note the modern browser versions!
+
 
 The ranges a-z, A-Z, 0-9 plus Unicode U+10000 and higher are preserved.  All
 other characters are encoded as `\h `, where `h` is one one or more lowercase
