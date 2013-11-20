@@ -16,6 +16,7 @@
   "development": [],
   "main": "index.js",
   "scripts": [
-    "index.js"
+    "index.js",
+    "lib/secure-filters.js"
   ]
 }
