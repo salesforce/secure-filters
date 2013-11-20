@@ -232,6 +232,12 @@ secureFilters.jsObj = function(val) {
  * **CAUTION** this is not the correct filter for a `style=""` attribute; use
  * the `style` filter instead!
  *
+ * **CAUTION** even though this module prevents breaking out of CSS context, it is
+ * still somewhat risky to allow user-controlled input into CSS and `<style>`
+ * blocks.  For example, consider that `font-face` can be used to load SVG fonts
+ * and that [SVG exploits are possible](https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability).
+ * Be sure to combine with whitelist-based input sanitization!
+ *
  * The ranges a-z, A-Z, 0-9 plus Unicode U+10000 and higher are preserved.  All
  * other characters are encoded as `\h `, where `h` is one one or more
  * lowercase hexadecimal digits, including the trailing space.
@@ -267,6 +273,10 @@ secureFilters.css = function(val) {
  * ```html
  *   <div style="background-color: #USERINPUT;"></div>
  * ```
+ * **CAUTION** even though this module prevents breaking out of style-attribute
+ * context, it is still somewhat risky to allow user-controlled input (see caveats
+ * on [css](#cssvalue) above).  Be sure to combine with whitelist-based input
+ * sanitization!
  *
  * Encodes the value first as in the `css()` filter, then entity-encodes the result.
  *

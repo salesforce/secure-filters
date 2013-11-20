@@ -10,8 +10,9 @@ for 2013, as determined by a broad consensus among
 [OWASP](https://www.owasp.org) members.
 
 To effectively combat XSS, you must combine input validation with output
-sanitization. This module aims to provide only output sanitization since there
-are plenty of JavaScript modules out there to do the validation part.
+sanitization.  **Using one or the other is not sufficient; you must apply
+both!** This module aims to provide only output sanitization since there are
+plenty of JavaScript modules out there to do the validation part.
 
 Whichever input validation and output sanitization modules you end up using,
 please review the code carefully and apply your own professional paranoia.
@@ -19,7 +20,8 @@ Trust, but verify.
 
 ### Input Validation
 
-You can roll your own input validation or you can use an existing module.  Either way, there are
+You can roll your own input validation or you can use an existing module.
+Either way, there are
 [many](https://owasp.org/index.php/Data_Validation)
 [important](https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security)
 [rules](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet) to follow.
@@ -304,8 +306,14 @@ Sanitizes output in CSS contexts by using backslash encoding.
   </style>
 ```
 
-**CAUTION** this is not the correct filter for a `style=""` attribute; use
+:warning: **CAUTION** this is not the correct filter for a `style=""` attribute; use
 the [`style(value)`](#stylevalue) filter instead!
+
+:warning: **CAUTION** even though this module prevents breaking out of CSS
+context, it is still somewhat risky to allow user-controlled input into CSS and
+`<style>` blocks.  For example, consider that `font-face` can be used to load
+SVG fonts and that [SVG exploits are possible](https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability).
+Be sure to combine with whitelist-based input sanitization!
 
 The ranges a-z, A-Z, 0-9 plus Unicode U+10000 and higher are preserved.  All
 other characters are encoded as `\h `, where `h` is one one or more lowercase
@@ -331,7 +339,12 @@ Encodes values for safe embedding in HTML style attribute context.
   <div style="background-color: #USERINPUT;"></div>
 ```
 
-Encodes the value first as in the `css()` filter, then entity-encodes the result.
+:warning: **CAUTION** even though this module prevents breaking out of style-attribute
+context, it is still somewhat risky to allow user-controlled input (see caveats
+on [css](#cssvalue) above).  Be sure to combine with whitelist-based input
+sanitization!
+
+Encodes the value first as in the `css()` filter, then HTML entity-encodes the result.
 
 For example, the string `<wow>` becomes `&#92;3c wow&#92;3e `.
 
