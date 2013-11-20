@@ -16,30 +16,11 @@ secureFilters.constructor = function secureFilters(){};
  * These filters were designed to be used with EJS, but due to their
  * simplicity, can easily be used in other contexts.
  *
- * By convention, `USERINPUT` is the string that is being embedded into a
- * certain context. It is _extremely_ important to choose the escaping function
- * that matches the particular context, so example contexts are given for each
- * function.  Beware of subtle differences, e.g. the `jsAttr` filter.
- *
- * In summary:
- * - `html()` - Sanitizes HTML contexts using entity-encoding.
- * - `js()` - Sanitizes JavaScript string contexts using backslash-encoding.
- * - `jsAttr()` - Sanitizes JavaScript string contexts _in an HTML attribute_
- *   using a combination of entity- and backslash-encoding.
- * - `jsObj()` - Sanitizes JavaScript objects for inclusion in HTML-script
- *   context.
- * - `uri()` - Sanitizes URI contexts using percent-encoding.
+ * See README.md for full documentation.
  */
 
 /**
  * Adds this module's filters to ejs.
- *
- * **USAGE**:
- *
- * ```js
- *   var secureFilters = require('secure-filters');
- *   var ejs = secureFilters.configure(require('ejs'));
- * ```
  *
  * @param {Object} ejs the EJS package object
  * @return {Object} the same EJS object
@@ -78,17 +59,7 @@ var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
 /**
  * Encodes values for safe embedding in HTML tags and attributes.
  *
- * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
- *
- * ```html
- *   <p>Hello, <span id="name">USERINPUT</span></p>
- *   <div class="USERINPUT"></div>
- *   <div class='USERINPUT'></div>
- * ```
- *
- * **CAUTION**: this is not the correct encoding for embedding the contents of
- * a `<script>` or `<style>` block (plus other blocks that cannot have
- * entity-encoded characters).
+ * See html(value) in README.md for full documentation.
  *
  * @name html
  * @param {any} val will be converted to a String prior to encoding
@@ -127,6 +98,12 @@ secureFilters.html = function(val) {
   });
 };
 
+/**
+ * Backslash-encoding for a single character in JavaScript contexts.
+ * @param {string} charStr single-character string.
+ * @return {string} backslash escaped character.
+ * @private
+ */
 function jsSlashEncoder(charStr) {
   var code = charStr.charCodeAt(0);
   var hex = code.toString(16).toUpperCase();
@@ -157,27 +134,7 @@ function jsSlashEncoder(charStr) {
 /**
  * Encodes values for safe embedding in JavaScript string contexts.
  *
- * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
- *
- * ```html
- *   <script>
- *     var singleQuote = 'USERINPUT';
- *     var doubleQuote = "USERINPUT";
- *     var anInt = parseInt('USERINPUT', 10);
- *     var aFloat = parseFloat('USERINPUT');
- *     var aBool = ('USERINPUT' === 'true');
- *   </script>
- * ```
- *
- * Any character that's not alphanumeric or `,-._` will be backslash encoded as
- * `\xHH`. U+00A0 and higher are encoded as `\uHHHH` instead. `H` is a
- * hexadecimal digit.
- *
- * **CAUTION**: you need to always put quotes around the embedded value; don't
- * assume that it's an int/float/boolean bare constant!
- *
- * **CAUTION**: this is not the correct encoding for the entire contents of a
- * `<script>` block!  You need to sanitize each variable in-turn.
+ * See js(value) in README.md for full documentation.
  *
  * @name js
  * @param {any} val will be converted to a String prior to encoding
@@ -192,22 +149,7 @@ secureFilters.js = function(val) {
 /**
  * Encodes values embedded in HTML scripting attributes.
  *
- * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
- *
- * ```html
- *   <a href="javascript:doActivate('USERINPUT')">click to activate</a>
- *   <button onclick="display('USERINPUT')">Click To Display</button>
- * ```
- *
- * This is a combination of backslash-encoding and entity-encoding. It
- * simultaneously prevents breaking out of HTML and JavaScript string contexts.
- *
- * For example, the string
- * `<ha>, 'ha', "ha"`
- * is escaped to
- * `\x3Cha\x3E, \&#39;ha\&#39;, \&quot;ha\&quot;`
- *
- * Note the backslashes before the apostrophe and quote entities.
+ * See jsAttr(value) in README.md for full documentation.
  *
  * @name jsAttr
  * @param {any} val will be converted to a String prior to encoding
@@ -220,21 +162,7 @@ secureFilters.jsAttr = function(val) {
 /**
  * Percent-encodes unsafe characters in URIs.
  *
- * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
- *
- * ```html
- *   <a href="http://example.com/?this=USERINPUT&that=USERINPUT">
- *   <a href="http://example.com/api/v2/user/USERINPUT">
- * ```
- *
- * The ranges 0-9, A-Z, a-z, plus hypen, dot and underscore (`-._`) are
- * preserved. Every other character is converted to UTF-8, then output as %XX
- * percent-encoded octets, where X is an uppercase hexidecimal digit.
- *
- * **Note** that if composing a URL, the entire result should ideally be
- * HTML-escaped before insertion into HTML. However, since Percent-encoding is
- * also HTML-safe, it may be sufficient to just URI-encode the untrusted
- * components if you know the rest is application-supplied.
+ * See uri(value) in README.md for full documentation.
  *
  * @name uri
  * @param {any} val will be converted to a String prior to encoding
@@ -259,19 +187,7 @@ secureFilters.uri = function(val) {
  * Encodes an object as JSON, but with unsafe characters in string literals
  * backslash-escaped.
  *
- * **USAGE**: all instances of `USERINPUT` should be sanitized by this function
- *
- * ```html
- *   <script>
- *     var config = USERINPUT;
- *   </script>
- * ```
- *
- * No special processing is required to parse the resulting JSON object.
- *
- * Specifically, this function encodes the object with `JSON.stringify()`, then
- * runs the result through the `js()` backslash-encoder.  Additionally, `]]>`
- * is converted to `\x5D\x5D\x3E` to prevent breaking out of a CDATA context.
+ * See jsObj(value) in README.md for full documentation.
  *
  * @name jsObj
  * @param {any} val
