@@ -4,7 +4,10 @@
   "description": "Anti-XSS filters for security",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js && mocha-phantomjs -R dot static/test.html"
+    "test": "mocha test.js && mocha-phantomjs -R dot static/test.html",
+    "blanket": {
+      "pattern": "secure-filters.js"
+    }
   },
   "homepage": "https://github.com/goinstant/secure-filters",
   "repository": "git@github.com:goinstant/secure-filters.git",
@@ -25,6 +28,9 @@
     "mocha": "1.8.2",
     "mocha-phantomjs": "2.0.2",
     "lodash": "1.3.1",
-    "component": "0.18.0"
+    "component": "0.18.0",
+    "coveralls": "2.3.0",
+    "mocha-lcov-reporter": "0.0.1",
+    "blanket": "1.1.5"
   }
 }
