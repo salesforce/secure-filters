@@ -33,12 +33,14 @@ One of those options is node-validator ([NPM](https://npmjs.org/package/validato
 It provides an impressive list of chainable validators. In addition to
 validation, it gives a set of handy [sanitization
 filters](https://github.com/chriso/node-validator#list-of-sanitization--filter-methods).
-There's even an `xss()` filter function that can strip-out certain _common_ XSS
-attack-strings. But, use caution: XSS attacks can be so highly obfuscated that
-they may be able to bypass Validator's detection algorithm. Validator also has
-a 3rd party [express-validate](https://github.com/Dream-Web/express-validate)
-middleware module for use in the popular [Express](http://expressjs.com/)
-node.js server.
+
+Validator has an `xss()` filter function that can strip-out certain _common_ XSS
+attack-strings. But, _use caution_: XSS attacks can be so highly obfuscated that
+they may be able to [bypass Validator's detection
+algorithm](https://nealpoole.com/blog/2013/07/xss-filter-bypass-in-validator-nodejs-module/).
+Validator also has a 3rd party
+[express-validate](https://github.com/Dream-Web/express-validate) middleware
+module for use in the popular [Express](http://expressjs.com/) node.js server.
 
 # Usage
 
