@@ -66,10 +66,10 @@ var HTML_CONTROL = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g;
 // NO-BREAK SPACE U+00A0 is fine since it's "whitespace".
 var HTML_NOT_WHITELISTED = /[^\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/g;
 
-// Matches alphanum and unicode. U+00A0 is ambiguously allowed as a "name" in
-// CSS (http://mathiasbynens.be/notes/css-escapes), so we don't whitelist it in
-// hopes that nobody actually uses it legitimately. This is consistent with ESAPI.
-var CSS_NOT_WHITELISTED = /[^a-zA-Z0-9\u00A1-\uFFFF]/g;
+// Matches alphanum and UTF-16 surrogate pairs (i.e. U+10000 and higher). The
+// rest of Unicode is deliberately absent in order to prevent charset encoding
+// issues.
+var CSS_NOT_WHITELISTED = /[^a-zA-Z0-9\uD800-\uDFFF]/g;
 
 /**
  * Encodes values for safe embedding in HTML tags and attributes.
@@ -232,10 +232,9 @@ secureFilters.jsObj = function(val) {
  * **CAUTION** this is not the correct filter for a `style=""` attribute; use
  * the `style` filter instead!
  *
- * The ranges a-z, A-Z, 0-9 plus Unicode code points greater than or equal to
- * U+00A1 are preserved.  All other characters are encoded as `\h `, where `h`
- * is one one or more lowercase hexadecimal digits, including the trailing
- * space.
+ * The ranges a-z, A-Z, 0-9 plus Unicode U+10000 and higher are preserved.  All
+ * other characters are encoded as `\h `, where `h` is one one or more
+ * lowercase hexadecimal digits, including the trailing space.
  *
  * Since [the behaviour of NUL in CSS2.1 is
  * undefined](http://www.w3.org/TR/CSS21/syndata.html#characters), it is

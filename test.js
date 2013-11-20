@@ -174,8 +174,8 @@ var ALL_CASES = [
     js: "\\u00E9,\\x20\\u00DF,\\x20\\u2603,\\x20\\uD83D\\uDE36",
     jsAttr: "&#92;u00E9,&#92;x20&#92;u00DF,&#92;x20&#92;u2603,&#92;x20&#92;uD83D&#92;uDE36",
     uri: '%C3%A9%2C%20%C3%9F%2C%20%E2%98%83%2C%20%F0%9F%98%B6',
-    css: 'é\\2c \\20 ß\\2c \\20 '+SNOWMAN+'\\2c \\20 '+FACE_WITHOUT_MOUTH,
-    style: 'é&#92;2c &#92;20 ß&#92;2c &#92;20 '+SNOWMAN+'&#92;2c &#92;20 '+FACE_WITHOUT_MOUTH
+    css: '\\e9 \\2c \\20 \\df \\2c \\20 \\2603 \\2c \\20 '+FACE_WITHOUT_MOUTH,
+    style: '&#92;e9 &#92;2c &#92;20 &#92;df &#92;2c &#92;20 &#92;2603 &#92;2c &#92;20 '+FACE_WITHOUT_MOUTH
   },
   {
     label: 'CDATA',

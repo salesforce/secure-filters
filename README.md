@@ -307,10 +307,9 @@ Sanitizes output in CSS contexts by using backslash encoding.
 **CAUTION** this is not the correct filter for a `style=""` attribute; use
 the [`style(value)`](#stylevalue) filter instead!
 
-The ranges a-z, A-Z, 0-9 plus Unicode code points greater than or equal to
-U+00A1 are preserved.  All other characters are encoded as `\h `, where `h`
-is one one or more lowercase hexadecimal digits, including the trailing
-space.
+The ranges a-z, A-Z, 0-9 plus Unicode U+10000 and higher are preserved.  All
+other characters are encoded as `\h `, where `h` is one one or more lowercase
+hexadecimal digits, including the trailing space.
 
 Confusingly, CSS allows `NO-BREAK SPACE` U+00A0 to be used in an identifier.
 Because of this confusion, it's possible browsers treat it as whitespace, and
