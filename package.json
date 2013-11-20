@@ -1,6 +1,6 @@
 {
   "name": "secure-filters",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Anti-XSS filters for security",
   "main": "index.js",
   "scripts": {
@@ -11,9 +11,15 @@
   "author": "GoInstant Inc., a salesforce.com company",
   "license": "BSD",
   "engines": {
-    "node":">= 0.10.0"
+    "node": ">= 0.10.0"
   },
-  "keywords": [ "security", "xss", "ejs", "escape", "encode" ],
+  "keywords": [
+    "security",
+    "xss",
+    "ejs",
+    "escape",
+    "encode"
+  ],
   "devDependencies": {
     "gi-assert": "git://github.com/goinstant/assert.git#v1.0.0",
     "mocha": "1.8.2",
