@@ -1,0 +1,509 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Secure-filters by goinstant</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Secure-filters</h1>
+        <p>Anti-XSS Security Filters for EJS and More</p>
+        <p class="view"><a href="https://github.com/goinstant/secure-filters">View the Project on GitHub <small>goinstant/secure-filters</small></a></p>
+        <ul>
+          <li><a href="https://github.com/goinstant/secure-filters/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/goinstant/secure-filters/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/goinstant/secure-filters">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="secure-filters" class="anchor" href="#secure-filters"><span class="octicon octicon-link"></span></a>secure-filters</h1>
+
+<p><code>secure-filters</code> is a collection of sanitization functions ("filters") to
+provide protection against <a href="https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29">Cross-Site Scripting (XSS)</a>
+and other injection attacks.</p>
+
+<p>Table of select contents:</p>
+
+<ul>
+<li><a href="#about-xss">About XSS</a></li>
+<li>
+<a href="#usage">Usage</a>
+
+<ul>
+<li>
+<a href="#installation">Installation</a> - <code>npm install --save secure-filters</code>
+</li>
+<li><a href="#with-ejs">EJS</a></li>
+<li><a href="#as-normal-functions">Normal functions</a></li>
+<li><a href="#client-side">Client-side</a></li>
+</ul>
+</li>
+<li>
+<a href="#functions">Functions</a>
+
+<ul>
+<li>
+<a href="#htmlvalue"><code>html(value)</code></a> - Sanitizes HTML contexts using entity-encoding.</li>
+<li>
+<a href="#jsvalue"><code>js(value)</code></a> - Sanitizes JavaScript string contexts using backslash-encoding.</li>
+<li>
+<a href="#jsobjvalue"><code>jsObj(value)</code></a> - Sanitizes JavaScript literals (numbers, strings,
+booleans, arrays, and objects) for inclusion in an HTML script context.</li>
+<li>
+<a href="#jsattrvalue"><code>jsAttr(value)</code></a> - Sanitizes JavaScript string contexts <em>in an HTML attribute</em>
+using a combination of entity- and backslash-encoding.</li>
+<li>
+<a href="#urivalue"><code>uri(value)</code></a> - Sanitizes URI contexts using percent-encoding.</li>
+<li>
+<a href="#cssvalue"><code>css(value)</code></a> - Sanitizes CSS contexts using backslash-encoding.</li>
+<li>
+<a href="#stylevalue"><code>style(value)</code></a> - Sanitizes CSS contexts <em>in an HTML <code>style</code> attribute</em>
+</li>
+</ul>
+</li>
+<li><a href="#contributing">Contributing</a></li>
+<li><a href="#support">Support</a></li>
+<li><a href="#legal">Legal</a></li>
+</ul><h1>
+<a name="about-xss" class="anchor" href="#about-xss"><span class="octicon octicon-link"></span></a>About XSS</h1>
+
+<p>XSS is the <a href="https://www.owasp.org/index.php/Top_10_2013-A3-Cross-Site_Scripting_%28XSS%29">#3 most critical security flaw affecting web
+applications</a>
+for 2013, as determined by a broad consensus among
+<a href="https://www.owasp.org">OWASP</a> members.</p>
+
+<p>To effectively combat XSS, you must combine input validation with output
+sanitization.  <strong>Using one or the other is not sufficient; you must apply
+both!</strong> This module aims to provide only output sanitization since there are
+plenty of JavaScript modules out there to do the validation part.</p>
+
+<p>Whichever input validation and output sanitization modules you end up using,
+please review the code carefully and apply your own professional paranoia.
+Trust, but verify.</p>
+
+<h3>
+<a name="input-validation" class="anchor" href="#input-validation"><span class="octicon octicon-link"></span></a>Input Validation</h3>
+
+<p>You can roll your own input validation or you can use an existing module.
+Either way, there are
+<a href="https://owasp.org/index.php/Data_Validation">many</a>
+<a href="https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security">important</a>
+<a href="https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet">rules</a> to follow.</p>
+
+<p><a href="http://stackoverflow.com/questions/4088723/validation-library-for-node-js">This Stack-Overflow
+thread</a>
+lists several input validation options specific to node.js.</p>
+
+<p>One of those options is node-validator (<a href="https://npmjs.org/package/validator">NPM</a>,
+<a href="https://github.com/chriso/node-validator">github</a>).
+It provides an impressive list of chainable validators. In addition to
+validation, it gives a set of handy <a href="https://github.com/chriso/node-validator#list-of-sanitization--filter-methods">sanitization
+filters</a>.</p>
+
+<p>Validator has an <code>xss()</code> filter function that can strip-out certain <em>common</em> XSS
+attack-strings. But, <em>use caution</em>: XSS attacks can be so highly obfuscated that
+they may be able to <a href="https://nealpoole.com/blog/2013/07/xss-filter-bypass-in-validator-nodejs-module/">bypass Validator's detection
+algorithm</a>.
+Validator also has a 3rd party
+<a href="https://github.com/Dream-Web/express-validate">express-validate</a> middleware
+module for use in the popular <a href="http://expressjs.com/">Express</a> node.js server.</p>
+
+<h1>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<p><code>secure-filters</code> can be used with EJS or as normal functions.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<div class="highlight highlight-sh"><pre>  npm install --save secure-filters
+</pre></div>
+
+<p><img class="emoji" title=":warning:" alt=":warning:" src="https://github.global.ssl.fastly.net/images/icons/emoji/warning.png" height="20" width="20" align="absmiddle"><strong>CAUTION</strong>: If the <code>Content-Type</code> HTTP header for your document, or
+the <code>&lt;meta charset=""&gt;</code> tag (or eqivalent) specifies a non-UTF-8 encoding these
+filters <em>may not provide adequate protection</em>! Some browsers can treat some
+characters at Unicode code-points <code>0x00A0</code> and above as if they were <code>&lt;</code> if the
+encoding is not set to UTF-8!</p>
+
+<h2>
+<a name="with-ejs" class="anchor" href="#with-ejs"><span class="octicon octicon-link"></span></a>With EJS</h2>
+
+<p>To configure EJS, simply wrap your <code>require('ejs')</code> call.  This will import the
+filters using the names pre-defined by this module.</p>
+
+<div class="highlight highlight-js"><pre>  <span class="kd">var</span> <span class="nx">ejs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'secure-filters'</span><span class="p">).</span><span class="nx">configure</span><span class="p">(</span><span class="nx">require</span><span class="p">(</span><span class="s1">'ejs'</span><span class="p">));</span>
+</pre></div>
+
+<p>Then, within an EJS template:</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="o">&lt;%-:</span> <span class="nx">config</span> <span class="o">|</span><span class="nx">jsObj</span><span class="o">%&gt;</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">userId</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="s1">'&lt;%-: userId |js%&gt;'</span><span class="p">,</span><span class="mi">10</span><span class="p">);</span>
+  <span class="nt">&lt;/script&gt;</span>
+  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"/welcome/&lt;%-: userId |uri%&gt;"</span><span class="nt">&gt;</span>Welcome <span class="err">&lt;</span>%-: userName |html%&gt;<span class="nt">&lt;/a&gt;</span>
+  <span class="nt">&lt;br&gt;</span>
+  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"javascript:activate('&lt;%-: userId |jsAttr%&gt;')"</span><span class="nt">&gt;</span>Click here to activate<span class="nt">&lt;/a&gt;</span>
+</pre></div>
+
+<h3>
+<a name="alternative-ejs-uses" class="anchor" href="#alternative-ejs-uses"><span class="octicon octicon-link"></span></a>Alternative EJS uses.</h3>
+
+<p>It's possible that the filter names pre-defined by this module interferes with
+existing filters that you've written. Or, you may wish to import a sub-set of
+the filters. In which case, you can simply assign properties to the
+<code>ejs.filters</code> object.</p>
+
+<div class="highlight highlight-js"><pre>  <span class="kd">var</span> <span class="nx">secureFilters</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'secure-filters'</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">ejs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'ejs'</span><span class="p">);</span>
+  <span class="nx">ejs</span><span class="p">.</span><span class="nx">filters</span><span class="p">.</span><span class="nx">secJS</span> <span class="o">=</span> <span class="nx">secureFilters</span><span class="p">.</span><span class="nx">js</span><span class="p">;</span>
+</pre></div>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
+    <span class="kd">var</span> <span class="nx">myStr</span> <span class="o">=</span> <span class="s2">"&lt;%-: myVal | secJS %&gt;"</span><span class="p">;</span>
+  <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>Or, you can namespace using a parametric style, similar to how EJS' pre-defined
+<code>get:'prop'</code> filter works:</p>
+
+<div class="highlight highlight-js"><pre>  <span class="kd">var</span> <span class="nx">secureFilters</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'secure-filters'</span><span class="p">);</span>
+  <span class="kd">var</span> <span class="nx">ejs</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'ejs'</span><span class="p">);</span>
+  <span class="nx">ejs</span><span class="p">.</span><span class="nx">filters</span><span class="p">.</span><span class="nx">sec</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">val</span><span class="p">,</span> <span class="nx">context</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">secureFilters</span><span class="p">[</span><span class="nx">context</span><span class="p">](</span><span class="nx">val</span><span class="p">);</span>
+  <span class="p">};</span>
+</pre></div>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
+    <span class="kd">var</span> <span class="nx">myStr</span> <span class="o">=</span> <span class="s2">"&lt;%-: myVal | sec:'js' %&gt;"</span><span class="p">;</span>
+  <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<h2>
+<a name="as-normal-functions" class="anchor" href="#as-normal-functions"><span class="octicon octicon-link"></span></a>As Normal Functions</h2>
+
+<p>The filter functions are just regular functions and can be used outside of EJS.</p>
+
+<div class="highlight highlight-js"><pre>  <span class="kd">var</span> <span class="nx">htmlEscape</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'secure-filters'</span><span class="p">).</span><span class="nx">html</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">escaped</span> <span class="o">=</span> <span class="nx">htmlEscape</span><span class="p">(</span><span class="s1">'"&gt;&lt;script&gt;alert(\'pwn\')&lt;/script&gt;'</span><span class="p">);</span>
+  <span class="nx">assert</span><span class="p">.</span><span class="nx">equal</span><span class="p">(</span><span class="nx">escaped</span><span class="p">,</span>
+    <span class="s1">'&amp;quot;&amp;gt;&amp;lt;script&amp;gt;alert&amp;#40;&amp;#39;pwn&amp;#39;&amp;#41;&amp;lt;&amp;#47;script&amp;gt;'</span><span class="p">);</span>
+</pre></div>
+
+<h2>
+<a name="client-side" class="anchor" href="#client-side"><span class="octicon octicon-link"></span></a>Client-side</h2>
+
+<p>You can simply include the <code>lib/secure-filters.js</code> file itself to get started.</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">src=</span><span class="s">"path/to/secure-filters.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+  <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span><span class="nt">&gt;</span>
+    <span class="kd">var</span> <span class="nx">escaped</span> <span class="o">=</span> <span class="nx">secureFilters</span><span class="p">.</span><span class="nx">html</span><span class="p">(</span><span class="nx">userInput</span><span class="p">);</span>
+    <span class="c1">//...</span>
+  <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>We've also added <a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD module
+definition</a> to <code>secure-filters.js</code>
+for use in <a href="http://requirejs.org">Require.js</a> and other AMD frameworks. We
+don't pre-define a name, but suggest that you use 'secure-filters'.</p>
+
+<h1>
+<a name="functions" class="anchor" href="#functions"><span class="octicon octicon-link"></span></a>Functions</h1>
+
+<p>By convention in the Contexts below, <code>USERINPUT</code> should be replaced with the
+output of the filter function.</p>
+
+<h3>
+<a name="htmlvalue" class="anchor" href="#htmlvalue"><span class="octicon octicon-link"></span></a>html(value)</h3>
+
+<p>Sanitizes output for HTML element and attribute contexts using entity-encoding.</p>
+
+<p>Contexts:</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;p&gt;</span>Hello, <span class="nt">&lt;span</span> <span class="na">id=</span><span class="s">"name"</span><span class="nt">&gt;</span>USERINPUT<span class="nt">&lt;/span&gt;&lt;/p&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"USERINPUT"</span><span class="nt">&gt;&lt;/div&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">'USERINPUT'</span><span class="nt">&gt;&lt;/div&gt;</span>
+</pre></div>
+
+<p><img class="emoji" title=":warning:" alt=":warning:" src="https://github.global.ssl.fastly.net/images/icons/emoji/warning.png" height="20" width="20" align="absmiddle"><strong>CAUTION</strong>: this is not the correct encoding for embedding the contents of
+a <code>&lt;script&gt;</code> or <code>&lt;style&gt;</code> block (plus other blocks that cannot have
+entity-encoded characters).</p>
+
+<p>Any character not matched by <code>/[\t\n\v\f\r ,\.0-9A-Z_a-z\-\u00A0-\uFFFF]/</code> is
+replaced with an HTML entity.  Additionally, characters matched by
+<code>/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/</code> are converted to spaces to avoid
+browser quirks that interpret these as non-characters.</p>
+
+<h4>
+<a name="a-note-about--" class="anchor" href="#a-note-about--"><span class="octicon octicon-link"></span></a>A Note About <code>&lt;%= %&gt;</code>
+</h4>
+
+<p>You might be asking "Why provide <code>html(var)</code>? EJS already does HTML escaping!".</p>
+
+<p>At the time of this writing, EJS doesn't escape the <code>'</code>
+(apostrophe) character when using the <code>&lt;%= %&gt;</code> syntax.  This can lead to
+XSS accidents!  Consider the template:</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">'&lt;%= prefs.avatar %&gt;'</span><span class="nt">&gt;</span>
+</pre></div>
+
+<p>When given user input <code>x' onerror='alert(1)</code>, the above gets rendered as:</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">'x'</span> <span class="na">onerror=</span><span class="s">'alert(1)'</span><span class="nt">&gt;</span>
+</pre></div>
+
+<p>Which will cause the <code>onerror</code> javascript to run.  Using this module's filter
+should prevent this.</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">'&lt;%-: prefs.avatar |html%&gt;'</span><span class="nt">&gt;</span>
+</pre></div>
+
+<p>When given user input <code>x' onerror='alert(1)</code>, the above gets rendered as:</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">'x&amp;#39; onerror&amp;#61;&amp;#39;alert&amp;#40;1&amp;#41;'</span><span class="nt">&gt;</span>
+</pre></div>
+
+<p>Which will not run the attacking script.</p>
+
+<h3>
+<a name="jsvalue" class="anchor" href="#jsvalue"><span class="octicon octicon-link"></span></a>js(value)</h3>
+
+<p>Sanitizes output for JavaScript <em>string</em> contexts using backslash-encoding.</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
+    <span class="kd">var</span> <span class="nx">singleQuote</span> <span class="o">=</span> <span class="s1">'USERINPUT'</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">doubleQuote</span> <span class="o">=</span> <span class="s2">"USERINPUT"</span><span class="p">;</span>
+    <span class="kd">var</span> <span class="nx">anInt</span> <span class="o">=</span> <span class="nb">parseInt</span><span class="p">(</span><span class="s1">'USERINPUT'</span><span class="p">,</span> <span class="mi">10</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">aFloat</span> <span class="o">=</span> <span class="nb">parseFloat</span><span class="p">(</span><span class="s1">'USERINPUT'</span><span class="p">);</span>
+    <span class="kd">var</span> <span class="nx">aBool</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'USERINPUT'</span> <span class="o">===</span> <span class="s1">'true'</span><span class="p">);</span>
+  <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p><img class="emoji" title=":warning:" alt=":warning:" src="https://github.global.ssl.fastly.net/images/icons/emoji/warning.png" height="20" width="20" align="absmiddle"><strong>CAUTION</strong>: you need to always put quotes around the embedded value; don't
+assume that it's a bare int/float/boolean constant!</p>
+
+<p><img class="emoji" title=":warning:" alt=":warning:" src="https://github.global.ssl.fastly.net/images/icons/emoji/warning.png" height="20" width="20" align="absmiddle"><strong>CAUTION</strong>: this is not the correct encoding for the entire contents of a
+<code>&lt;script&gt;</code> block!  You need to sanitize each variable in-turn.</p>
+
+<p>Any character not matched by <code>/[,\-\.0-9A-Z_a-z]/</code> is escaped as <code>\xHH</code> or
+<code>\uHHHH</code> where <code>H</code> is a hexidecimal digit.  The shorter <code>\x</code> form is used for
+charaters in the 7-bit ASCII range (i.e. code point &lt;= 0x7F).</p>
+
+<h3>
+<a name="jsobjvalue" class="anchor" href="#jsobjvalue"><span class="octicon octicon-link"></span></a>jsObj(value)</h3>
+
+<p>Sanitizes output for a JavaScript literal in an HTML script context.</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="nx">USERINPUT</span><span class="p">;</span>
+  <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<p>This function encodes the object with <code>JSON.stringify()</code>, then
+escapes certain characters.  Any character not matched by
+<code>/[",\-\.0-9:A-Z\[\\\]_a-z{}]/</code> is escaped consistent with the
+<a href="#jsvalue"><code>js(value)</code></a> escaping above. Additionally, the sub-string <code>]]&gt;</code> is
+encoded as <code>\x5D\x5D\x3E</code> to prevent breaking out of CDATA context.</p>
+
+<p>Because <code>&lt;</code> and <code>&gt;</code> are not matched characters, they get encoded as <code>\x3C</code> and
+<code>\x3E</code>, respectively. This prevents breaking out of a surrounding HTML
+<code>&lt;script&gt;</code> context.</p>
+
+<p>For example, with a literal object like <code>{username:'Albert
+&lt;/script&gt;&lt;script&gt;alert("Pwnerton")'}</code>, <code>jsObj()</code> gives output:</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
+    <span class="kd">var</span> <span class="nx">config</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"username"</span><span class="o">:</span><span class="s2">"\x3C\x2Fscript\x3E\x3Cscript\x3Ealert\x28\"Pwnerton\"\x29"</span><span class="p">};</span>
+  <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<h4>
+<a name="json-is-not-a-subset-of-javascript" class="anchor" href="#json-is-not-a-subset-of-javascript"><span class="octicon octicon-link"></span></a>JSON is not a subset of JavaScript</h4>
+
+<p>Article: <a href="http://timelessrepo.com/json-isnt-a-javascript-subset">JSON isn't a JavaScript
+Subset</a>.</p>
+
+<p>JSON is <em>almost</em> a subset of JavaScript, but for two characters: <a href="http://www.fileformat.info/info/unicode/char/2028/index.htm"><code>LINE
+SEPARATOR</code> U+2028</a>
+and <a href="http://www.fileformat.info/info/unicode/char/2029/index.htm"><code>PARAGRAPH SEPARATOR</code>
+U+2029</a>.  These
+two characters can't legally appear in JavaScript strings and must be escaped.
+Due to the ambiguity of these and other Unicode whitespace characters,
+<code>secure-filters</code> will backslash encode U+2028 as <code>\u2028</code>, U+2029 as <code>\u2029</code>,
+etc.</p>
+
+<h3>
+<a name="jsattrvalue" class="anchor" href="#jsattrvalue"><span class="octicon octicon-link"></span></a>jsAttr(value)</h3>
+
+<p>Sanitizes output for embedded HTML scripting attributes using a special
+combination of backslash- and entity-encoding.</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"javascript:doActivate('USERINPUT')"</span><span class="nt">&gt;</span>click to activate<span class="nt">&lt;/a&gt;</span>
+  <span class="nt">&lt;button</span> <span class="na">onclick=</span><span class="s">"display('USERINPUT')"</span><span class="nt">&gt;</span>Click To Display<span class="nt">&lt;/button&gt;</span>
+</pre></div>
+
+<p>The string <code>&lt;ha&gt;, 'ha', "ha"</code> is escaped to <code>&amp;lt;ha&amp;gt;, \&amp;#39;ha\&amp;#39;,
+\&amp;quot;ha\&amp;quot;</code>. Note the backslashes before the apostrophe and quote
+entities.</p>
+
+<h3>
+<a name="urivalue" class="anchor" href="#urivalue"><span class="octicon octicon-link"></span></a>uri(value)</h3>
+
+<p>Sanitizes output in URI component contexts by using percent-encoding.</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"http://example.com/?this=USERINPUT&amp;that=USERINPUT"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">"http://example.com/api/v2/user/USERINPUT"</span><span class="nt">&gt;</span>
+</pre></div>
+
+<p>The ranges 0-9, A-Z, a-z, plus hypen, dot and underscore (<code>-._</code>) are
+preserved. Every other character is converted to UTF-8, then output as %XX
+percent-encoded octets, where X is an uppercase hexidecimal digit.</p>
+
+<p><strong>Note</strong> that if composing a URL, the entire result should ideally be
+HTML-escaped before insertion into HTML. However, since Percent-encoding is
+also HTML-safe, it may be sufficient to just URI-encode the untrusted
+components if you know the rest is application-supplied.</p>
+
+<h3>
+<a name="cssvalue" class="anchor" href="#cssvalue"><span class="octicon octicon-link"></span></a>css(value)</h3>
+
+<p>Sanitizes output in CSS contexts by using backslash encoding.</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;style </span><span class="na">type=</span><span class="s">"text/css"</span><span class="nt">&gt;</span>
+    <span class="nf">#user-USERINPUT</span> <span class="p">{</span>
+      <span class="k">background-color</span><span class="o">:</span> <span class="m">#USERIN</span><span class="n">PUT</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="nt">&lt;/style&gt;</span>
+</pre></div>
+
+<p><img class="emoji" title=":warning:" alt=":warning:" src="https://github.global.ssl.fastly.net/images/icons/emoji/warning.png" height="20" width="20" align="absmiddle"><strong>CAUTION</strong> this is not the correct filter for a <code>style=""</code> attribute; use
+the <a href="#stylevalue"><code>style(value)</code></a> filter instead!</p>
+
+<p><img class="emoji" title=":warning:" alt=":warning:" src="https://github.global.ssl.fastly.net/images/icons/emoji/warning.png" height="20" width="20" align="absmiddle"><strong>CAUTION</strong> even though this module prevents breaking out of CSS
+context, it is still somewhat risky to allow user-controlled input into CSS and
+<code>&lt;style&gt;</code> blocks. Be sure to combine CSS escaping with whitelist-based input
+sanitization! Here's a small sampling of what's possible:</p>
+
+<ul>
+<li><a href="https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability">https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability</a></li>
+<li>
+<a href="http://html5sec.org/#43">http://html5sec.org/#43</a> - note the modern browser versions!</li>
+</ul><p>The ranges a-z, A-Z, 0-9 plus Unicode U+10000 and higher are preserved.  All
+other characters are encoded as <code>\h</code>, where <code>h</code> is one one or more lowercase
+hexadecimal digits, including the trailing space.</p>
+
+<p>Confusingly, CSS allows <code>NO-BREAK SPACE</code> U+00A0 to be used in an identifier.
+Because of this confusion, it's possible browsers treat it as whitespace, and
+so <code>secure-filters</code> escapes it.</p>
+
+<p>Since <a href="http://www.w3.org/TR/CSS21/syndata.html#characters">the behaviour of NUL in CSS2.1 is
+undefined</a>, it is replaced
+with <code>\fffd</code>, <code>REPLACEMENT CHARACTER</code> U+FFFD.</p>
+
+<p>For example, the string <code>&lt;wow&gt;</code> becomes <code>\3c wow\3e</code> (note the trailing space).</p>
+
+<h3>
+<a name="stylevalue" class="anchor" href="#stylevalue"><span class="octicon octicon-link"></span></a>style(value)</h3>
+
+<p>Encodes values for safe embedding in HTML style attribute context.</p>
+
+<p><strong>USAGE</strong>: all instances of <code>USERINPUT</code> should be sanitized by this function</p>
+
+<div class="highlight highlight-html"><pre>  <span class="nt">&lt;div</span> <span class="na">style=</span><span class="s">"background-color: #USERINPUT;"</span><span class="nt">&gt;&lt;/div&gt;</span>
+</pre></div>
+
+<p><img class="emoji" title=":warning:" alt=":warning:" src="https://github.global.ssl.fastly.net/images/icons/emoji/warning.png" height="20" width="20" align="absmiddle"><strong>CAUTION</strong> even though this module prevents breaking out of style-attribute
+context, it is still somewhat risky to allow user-controlled input (see caveats
+on <a href="#cssvalue">css</a> above).  Be sure to combine with whitelist-based input
+sanitization!</p>
+
+<p>Encodes the value first as in the <code>css()</code> filter, then HTML entity-encodes the result.</p>
+
+<p>For example, the string <code>&lt;wow&gt;</code> becomes <code>&amp;#92;3c wow&amp;#92;3e</code>.</p>
+
+<h1>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h1>
+
+<p>If you'd like to contribute to or modify secure-filters, here's a quick guide
+to get you started.</p>
+
+<h2>
+<a name="development-dependencies" class="anchor" href="#development-dependencies"><span class="octicon octicon-link"></span></a>Development Dependencies</h2>
+
+<ul>
+<li>
+<a href="http://nodejs.org">node.js</a> &gt;= 0.10</li>
+</ul><h2>
+<a name="set-up" class="anchor" href="#set-up"><span class="octicon octicon-link"></span></a>Set-Up</h2>
+
+<p>Download via GitHub and install npm dependencies:</p>
+
+<div class="highlight highlight-sh"><pre>git clone git@github.com:goinstant/secure-filters.git
+<span class="nb">cd </span>secure-filters
+
+npm install
+</pre></div>
+
+<h2>
+<a name="testing" class="anchor" href="#testing"><span class="octicon octicon-link"></span></a>Testing</h2>
+
+<p>Testing is with the <a href="https://github.com/visionmedia/mocha">mocha</a> framework.
+Tests are located in the <code>tests/</code> directory.</p>
+
+<p>The unit tests are run twice: once under node.js and once under
+<a href="http://phantomjs.org/">PhantomJS</a>. PhantomJS test files are located in the
+<code>static/</code> directory.</p>
+
+<p>To run the tests:</p>
+
+<div class="highlight highlight-sh"><pre>npm <span class="nb">test</span>
+</pre></div>
+
+<h2>
+<a name="publishing" class="anchor" href="#publishing"><span class="octicon octicon-link"></span></a>Publishing</h2>
+
+<ol>
+<li>
+<code>npm version patch</code> (increments <code>x</code> in <code>z.y.x</code>, then makes a commit for package.json, tags that commit)</li>
+<li><code>git push --tags origin master</code></li>
+<li><code>npm publish</code></li>
+</ol><p>Go to <a href="https://npmjs.org/package/secure-filters">https://npmjs.org/package/secure-filters</a> and verify it published (can take several minutes)</p>
+
+<h1>
+<a name="support" class="anchor" href="#support"><span class="octicon octicon-link"></span></a>Support</h1>
+
+<p>Email <a href="mailto:support@goinstant.com">GoInstant Support</a> or stop by <a>#goinstant on freenode</a>.</p>
+
+<p>For responsible disclosures, email <a href="mailto:security@goinstant.com">GoInstant Security</a>.</p>
+
+<p>To <a href="https://github.com/goinstant/secure-filters/issues">file a bug</a> or
+<a href="https://github.com/goinstant/secure-filters/pulls">propose a patch</a>,
+please use github directly.</p>
+
+<h1>
+<a name="legal" class="anchor" href="#legal"><span class="octicon octicon-link"></span></a>Legal</h1>
+
+<p>© 2013 GoInstant Inc., a salesforce.com company</p>
+
+<p>Licensed under the BSD 3-clause license.</p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/goinstant">goinstant</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
