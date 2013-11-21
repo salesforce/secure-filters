@@ -110,6 +110,13 @@ Then, within an EJS template:
 Rather than importing the pre-defined names we've chosen, here are some other
 ways to integrate `secure-filters` with EJS.
 
+#### Replacing EJS's default escape
+
+As of EJS 0.8.4, you can replace the `escape()` function during template
+compilation.  This allows `<%= %>` to be safer than [the
+default](#a-note-about--).
+
+
 #### One-by-one
 
 It's possible that the filter names pre-defined by this module interferes with
@@ -147,12 +154,6 @@ Or, you can namespace using a parametric style, similar to how EJS' pre-defined
     var myStr = "<%-: myVal | sec:'js' %>";
   </script>
 ```
-
-#### Replacing EJS's default escape
-
-As of EJS 0.8.4, you can replace the `escape()` function during template
-compilation.  This allows `<%= %>` to be safer than [the
-default](#a-note-about--).
 
 ```js
 var escapeHTML = secureFilters.html;
