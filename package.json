@@ -9,7 +9,7 @@
       "pattern": "secure-filters.js"
     }
   },
-  "homepage": "https://github.com/goinstant/secure-filters",
+  "homepage": "http://goinstant.github.io/secure-filters/",
   "repository": "git@github.com:goinstant/secure-filters.git",
   "author": "GoInstant Inc., a salesforce.com company",
   "license": "BSD-3-Clause",
