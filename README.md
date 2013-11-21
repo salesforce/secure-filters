@@ -4,6 +4,8 @@
 provide protection against [Cross-Site Scripting (XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29)
 and other injection attacks.
 
+[![Build Status](https://travis-ci.org/goinstant/secure-filters.png?branch=master)](https://travis-ci.org/goinstant/secure-filters)
+
 Table of select contents:
 
 - [About XSS](#about-xss)
