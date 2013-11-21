@@ -176,6 +176,10 @@ ways to integrate <code>secure-filters</code> with EJS.</p>
 compilation.  This allows <code>&lt;%= %&gt;</code> to be safer than <a href="#a-note-about--">the
 default</a>.</p>
 
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">escapeHTML</span> <span class="o">=</span> <span class="nx">secureFilters</span><span class="p">.</span><span class="nx">html</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">templateFn</span> <span class="o">=</span> <span class="nx">ejs</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="p">{</span> <span class="nx">escape</span><span class="o">:</span> <span class="nx">escapeHTML</span> <span class="p">});</span>
+</pre></div>
+
 <h4>
 <a name="one-by-one" class="anchor" href="#one-by-one"><span class="octicon octicon-link"></span></a>One-by-one</h4>
 
@@ -210,10 +214,6 @@ the filters. In which case, you can simply assign properties to the
 <div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
     <span class="kd">var</span> <span class="nx">myStr</span> <span class="o">=</span> <span class="s2">"&lt;%-: myVal | sec:'js' %&gt;"</span><span class="p">;</span>
   <span class="nt">&lt;/script&gt;</span>
-</pre></div>
-
-<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">escapeHTML</span> <span class="o">=</span> <span class="nx">secureFilters</span><span class="p">.</span><span class="nx">html</span><span class="p">;</span>
-<span class="kd">var</span> <span class="nx">templateFn</span> <span class="o">=</span> <span class="nx">ejs</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="p">{</span> <span class="nx">escape</span><span class="o">:</span> <span class="nx">escapeHTML</span> <span class="p">});</span>
 </pre></div>
 
 <h2>
