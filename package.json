@@ -1,6 +1,6 @@
 {
   "name": "secure-filters",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Anti-XSS filters for security",
   "main": "index.js",
   "scripts": {
