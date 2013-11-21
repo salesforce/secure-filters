@@ -118,6 +118,10 @@ As of EJS 0.8.4, you can replace the `escape()` function during template
 compilation.  This allows `<%= %>` to be safer than [the
 default](#a-note-about--).
 
+```js
+var escapeHTML = secureFilters.html;
+var templateFn = ejs.compile(template, { escape: escapeHTML });
+```
 
 #### One-by-one
 
@@ -155,11 +159,6 @@ Or, you can namespace using a parametric style, similar to how EJS' pre-defined
   <script>
     var myStr = "<%-: myVal | sec:'js' %>";
   </script>
-```
-
-```js
-var escapeHTML = secureFilters.html;
-var templateFn = ejs.compile(template, { escape: escapeHTML });
 ```
 
 ## As Normal Functions
