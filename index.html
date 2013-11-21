@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>Secure-filters by goinstant</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Secure-filters : Anti-XSS Security Filters for EJS and More" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Secure-filters</title>
   </head>
 
   <body>
-    <div id="container">
-      <div class="inner">
 
-        <header>
-          <h1>Secure-filters</h1>
-          <h2>Anti-XSS Security Filters for EJS and More</h2>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/goinstant/secure-filters">View on GitHub</a>
+
+          <h1 id="project_title">Secure-filters</h1>
+          <h2 id="project_tagline">Anti-XSS Security Filters for EJS and More</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/goinstant/secure-filters/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/goinstant/secure-filters/tarball/master">Download this project as a tar.gz file</a>
+            </section>
         </header>
+    </div>
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/goinstant/secure-filters/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/goinstant/secure-filters/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/goinstant/secure-filters" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
-
-        <hr>
-
-        <section id="main_content">
-          <h1>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
 <a name="secure-filters" class="anchor" href="#secure-filters"><span class="octicon octicon-link"></span></a>secure-filters</h1>
 
 <p><code>secure-filters</code> is a collection of sanitization functions ("filters") to
@@ -164,6 +164,19 @@ filters using the names pre-defined by this module.</p>
 <h3>
 <a name="alternative-ejs-uses" class="anchor" href="#alternative-ejs-uses"><span class="octicon octicon-link"></span></a>Alternative EJS uses.</h3>
 
+<p>Rather than importing the pre-defined names we've chosen, here are some other
+ways to integrate <code>secure-filters</code> with EJS.</p>
+
+<h4>
+<a name="replacing-ejss-default-escape" class="anchor" href="#replacing-ejss-default-escape"><span class="octicon octicon-link"></span></a>Replacing EJS's default escape</h4>
+
+<p>As of EJS 0.8.4, you can replace the <code>escape()</code> function during template
+compilation.  This allows <code>&lt;%= %&gt;</code> to be safer than <a href="#a-note-about--">the
+default</a>.</p>
+
+<h4>
+<a name="one-by-one" class="anchor" href="#one-by-one"><span class="octicon octicon-link"></span></a>One-by-one</h4>
+
 <p>It's possible that the filter names pre-defined by this module interferes with
 existing filters that you've written. Or, you may wish to import a sub-set of
 the filters. In which case, you can simply assign properties to the
@@ -179,6 +192,9 @@ the filters. In which case, you can simply assign properties to the
   <span class="nt">&lt;/script&gt;</span>
 </pre></div>
 
+<h4>
+<a name="parametric" class="anchor" href="#parametric"><span class="octicon octicon-link"></span></a>Parametric</h4>
+
 <p>Or, you can namespace using a parametric style, similar to how EJS' pre-defined
 <code>get:'prop'</code> filter works:</p>
 
@@ -192,6 +208,10 @@ the filters. In which case, you can simply assign properties to the
 <div class="highlight highlight-html"><pre>  <span class="nt">&lt;script&gt;</span>
     <span class="kd">var</span> <span class="nx">myStr</span> <span class="o">=</span> <span class="s2">"&lt;%-: myVal | sec:'js' %&gt;"</span><span class="p">;</span>
   <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">escapeHTML</span> <span class="o">=</span> <span class="nx">secureFilters</span><span class="p">.</span><span class="nx">html</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">templateFn</span> <span class="o">=</span> <span class="nx">ejs</span><span class="p">.</span><span class="nx">compile</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="p">{</span> <span class="nx">escape</span><span class="o">:</span> <span class="nx">escapeHTML</span> <span class="p">});</span>
 </pre></div>
 
 <h2>
@@ -501,15 +521,18 @@ please use github directly.</p>
 <p>© 2013 GoInstant Inc., a salesforce.com company</p>
 
 <p>Licensed under the BSD 3-clause license.</p>
-        </section>
-
-        <footer>
-          Secure-filters is maintained by <a href="https://github.com/goinstant">goinstant</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
-      </div>
+      </section>
     </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Secure-filters maintained by <a href="https://github.com/goinstant">goinstant</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
   </body>
 </html>
