@@ -6,7 +6,6 @@ and other injection attacks.
 
 Table of select contents:
 
-- [Installation](#installation)
 - [About XSS](#about-xss)
 - [Usage](#usage)
   - [Installation](#installation) - `npm install --save secure-filters`
@@ -26,8 +25,6 @@ Table of select contents:
 - [Contributing](#contributing)
 - [Support](#support)
 - [Legal](#legal)
-
-# Installation
 
 # About XSS
 
