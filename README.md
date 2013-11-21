@@ -107,6 +107,18 @@ Then, within an EJS template:
 
 ### Alternative EJS uses.
 
+Rather than importing the pre-defined names we've chosen, here are some other
+ways to integrate `secure-filters` with EJS.
+
+#### Replacing EJS's default escape
+
+As of EJS 0.8.4, you can replace the `escape()` function during template
+compilation.  This allows `<%= %>` to be safer than [the
+default](#a-note-about--).
+
+
+#### One-by-one
+
 It's possible that the filter names pre-defined by this module interferes with
 existing filters that you've written. Or, you may wish to import a sub-set of
 the filters. In which case, you can simply assign properties to the
@@ -124,6 +136,8 @@ the filters. In which case, you can simply assign properties to the
   </script>
 ```
 
+#### Parametric
+
 Or, you can namespace using a parametric style, similar to how EJS' pre-defined
 `get:'prop'` filter works:
 
@@ -139,6 +153,11 @@ Or, you can namespace using a parametric style, similar to how EJS' pre-defined
   <script>
     var myStr = "<%-: myVal | sec:'js' %>";
   </script>
+```
+
+```js
+var escapeHTML = secureFilters.html;
+var templateFn = ejs.compile(template, { escape: escapeHTML });
 ```
 
 ## As Normal Functions
