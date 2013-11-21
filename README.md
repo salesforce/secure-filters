@@ -4,6 +4,33 @@
 provide protection against [Cross-Site Scripting (XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29)
 and other injection attacks.
 
+Table of select contents:
+
+- [Installation](#installation)
+- [About XSS](#about-xss)
+- [Usage](#usage)
+  - [Installation](#installation) - `npm install --save secure-filters`
+  - [EJS](#with-ejs)
+  - [Normal functions](#as-normal-functions)
+  - [Client-side](#client-side)
+- [Functions](#functions)
+  - [`html(value)`](#htmlvalue) - Sanitizes HTML contexts using entity-encoding.
+  - [`js(value)`](#jsvalue) - Sanitizes JavaScript string contexts using backslash-encoding.
+  - [`jsObj(value)`](#jsobjvalue) - Sanitizes JavaScript literals (numbers, strings,
+    booleans, arrays, and objects) for inclusion in an HTML script context.
+  - [`jsAttr(value)`](#jsattrvalue) - Sanitizes JavaScript string contexts _in an HTML attribute_
+    using a combination of entity- and backslash-encoding.
+  - [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
+  - [`css(value)`](#cssvalue) - Sanitizes CSS contexts using backslash-encoding.
+  - [`style(value)`](#stylevalue) - Sanitizes CSS contexts _in an HTML `style` attribute_
+- [Contributing](#contributing)
+- [Support](#support)
+- [Legal](#legal)
+
+# Installation
+
+# About XSS
+
 XSS is the [#3 most critical security flaw affecting web
 applications](https://www.owasp.org/index.php/Top_10_2013-A3-Cross-Site_Scripting_%28XSS%29)
 for 2013, as determined by a broad consensus among
@@ -47,6 +74,12 @@ module for use in the popular [Express](http://expressjs.com/) node.js server.
 # Usage
 
 `secure-filters` can be used with EJS or as normal functions.
+
+## Installation
+
+```sh
+  npm install --save secure-filters
+```
 
 :warning: **CAUTION**: If the `Content-Type` HTTP header for your document, or
 the `<meta charset="">` tag (or eqivalent) specifies a non-UTF-8 encoding these
@@ -122,20 +155,24 @@ The filter functions are just regular functions and can be used outside of EJS.
     '&quot;&gt;&lt;script&gt;alert&#40;&#39;pwn&#39;&#41;&lt;&#47;script&gt;');
 ```
 
+## Client-side
+
+You can simply include the `lib/secure-filters.js` file itself to get started.
+
+```html
+  <script type="text/javascript" src="path/to/secure-filters.js"></script>
+  <script type="text/javascript">
+    var escaped = secureFilters.html(userInput);
+    //...
+  </script>
+```
+
+We've also added [AMD module
+definition](https://github.com/amdjs/amdjs-api/wiki/AMD) to `secure-filters.js`
+for use in [Require.js](http://requirejs.org) and other AMD frameworks. We
+don't pre-define a name, but suggest that you use 'secure-filters'.
+
 # Functions
-
-Available functions:
-
-- [`html(value)`](#htmlvalue) - Sanitizes HTML contexts using entity-encoding.
-- [`js(value)`](#jsvalue) - Sanitizes JavaScript string contexts using backslash-encoding.
-- [`jsObj(value)`](#jsobjvalue) - Sanitizes JavaScript literals (numbers, strings,
-  booleans, arrays, and objects) for inclusion in an HTML script context.
-- [`jsAttr(value)`](#jsattrvalue) - Sanitizes JavaScript string contexts _in an HTML attribute_
-  using a combination of entity- and backslash-encoding.
-- [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
-- [`css(value)`](#cssvalue) - Sanitizes CSS contexts using backslash-encoding.
-- [`style(value)`](#stylevalue) - Sanitizes CSS contexts _in an HTML `style`
-  attribute_ using entity- and backslash-encoding.
 
 By convention in the Contexts below, `USERINPUT` should be replaced with the
 output of the filter function.
@@ -404,7 +441,7 @@ To [file a bug](https://github.com/goinstant/secure-filters/issues) or
 [propose a patch](https://github.com/goinstant/secure-filters/pulls),
 please use github directly.
 
-# License
+# Legal
 
 &copy; 2013 GoInstant Inc., a salesforce.com company
 
