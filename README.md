@@ -12,6 +12,7 @@ Table of select contents:
 - [Usage](#usage)
   - [Installation](#installation) - `npm install --save secure-filters`
   - [EJS](#with-ejs)
+  - [Jade](#with-jade)
   - [Normal functions](#as-normal-functions)
   - [Client-side](#client-side)
 - [Functions](#functions)
@@ -24,6 +25,9 @@ Table of select contents:
   - [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
   - [`css(value)`](#cssvalue) - Sanitizes CSS contexts using backslash-encoding.
   - [`style(value)`](#stylevalue) - Sanitizes CSS contexts _in an HTML `style` attribute_
+- [Utility Functions](#utility)
+  - [`configure(ejs)`](#configureejs)
+  - [`inject(obj)`](#injectobj)
 - [Contributing](#contributing)
 - [Support](#support)
 - [Legal](#legal)
@@ -161,6 +165,40 @@ Or, you can namespace using a parametric style, similar to how EJS' pre-defined
   </script>
 ```
 
+## With Jade
+
+Integrating with [Jade](http://jade-lang.org) isn't quite as easy as EJS, but
+still somewhat readable.
+
+```js
+  var config = { loggedIn: true };
+  var locals = secureFilters.inject({
+    config: config
+  });
+  jade.render(template, locals);
+```
+
+And in the template you use the `!{}` interpolation operator
+
+```jade
+  script.
+    var config = !{jsObj(config)};
+```
+
+Produces
+
+```html
+  <script>var config = {"loggedIn":true};</script>
+```
+
+### Replacing Jade's default escape
+
+Replacing Jade's default escaping is easy
+
+```js
+  jade.runtime.escape = secureFilters.html;
+```
+
 ## As Normal Functions
 
 The filter functions are just regular functions and can be used outside of EJS.
@@ -190,6 +228,8 @@ for use in [Require.js](http://requirejs.org) and other AMD frameworks. We
 don't pre-define a name, but suggest that you use 'secure-filters'.
 
 # Functions
+
+## Filters
 
 By convention in the Contexts below, `USERINPUT` should be replaced with the
 output of the filter function.
@@ -404,6 +444,32 @@ sanitization!
 Encodes the value first as in the `css()` filter, then HTML entity-encodes the result.
 
 For example, the string `<wow>` becomes `&#92;3c wow&#92;3e `.
+
+## Utility
+
+### configure(ejs)
+
+Configures EJS with the filter functions in this module.  Returns the `ejs` module you passed in.
+
+```js
+  var ejs = require('ejs');
+  ejs = secureFilters.configure(ejs);
+```
+
+Note that this doesn't modify EJS's default escape routine.  [See
+above](#replacing-ejss-default-escape) for instructions on how to do this.
+
+### inject(obj)
+
+Adds all of the filter functions in this module into an object.  Returns the same, modified object.
+
+```js
+  var locals = {
+    name: 'bob'
+  };
+  secureFilters.inject(locals);
+  someTemplateLang.render(template, locals);
+```
 
 # Contributing
 
