@@ -219,9 +219,9 @@ browser quirks that interpret these as non-characters.
 
 You might be asking "Why provide `html(var)`? EJS already does HTML escaping!".
 
-At the time of this writing, EJS doesn't escape the `'`
-(apostrophe) character when using the `<%= %>` syntax.  This can lead to
-XSS accidents!  Consider the template:
+[Prior to 0.8.5](https://github.com/visionmedia/ejs/blob/master/History.md#085--2013-11-21),
+EJS doesn't escape the `'` (apostrophe) character when using the `<%= %>`
+syntax.  This can lead to XSS accidents!  Consider the template:
 
 ```html
   <img src='<%= prefs.avatar %>'>
