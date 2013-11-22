@@ -324,4 +324,44 @@ describe('exporting to EJS', function() {
   });
 });
 
+var jade;
+try {
+  jade = require('jade');
+} catch (e) {
+}
+
+if (jade) {
+  describe('jade integration', function() {
+    describe('default escape', function() {
+      it('has not-so-safe escaping before', function() {
+        var result = jade.render('a(href=foo)',{foo: 'some="where"'});
+        assert.equal(result, '<a href="some=&quot;where&quot;"></a>');
+      });
+      it('has slightly better escaping after', function() {
+        var origEscape = jade.runtime.escape;
+        jade.runtime.escape = secureFilters.html;
+        try {
+          var result = jade.render('a(href=foo)',{foo: 'some="where"'});
+          assert.equal(result, '<a href="some&#61;&quot;where&quot;"></a>');
+        } finally {
+          jade.runtime.escape = origEscape;
+        }
+      });
+    });
+
+    describe('custom escaping', function() {
+      it('jsObj interpolation', function() {
+        var template = 'script.\n' +
+          '  var name = !{jsObj(name)};\n';
+        var opts = {
+          jsObj: secureFilters.jsObj,
+          name: '</script>'
+        };
+        var result = jade.render(template, opts);
+        assert.equal(result, '<script>var name = "\\x3C\\x2Fscript\\x3E";</script>');
+      });
+    });
+  });
+}
+
 }(this));
