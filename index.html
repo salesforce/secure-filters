@@ -277,9 +277,9 @@ browser quirks that interpret these as non-characters.</p>
 
 <p>You might be asking "Why provide <code>html(var)</code>? EJS already does HTML escaping!".</p>
 
-<p>At the time of this writing, EJS doesn't escape the <code>'</code>
-(apostrophe) character when using the <code>&lt;%= %&gt;</code> syntax.  This can lead to
-XSS accidents!  Consider the template:</p>
+<p><a href="https://github.com/visionmedia/ejs/blob/master/History.md#085--2013-11-21">Prior to 0.8.5</a>,
+EJS doesn't escape the <code>'</code> (apostrophe) character when using the <code>&lt;%= %&gt;</code>
+syntax.  This can lead to XSS accidents!  Consider the template:</p>
 
 <div class="highlight highlight-html"><pre>  <span class="nt">&lt;img</span> <span class="na">src=</span><span class="s">'&lt;%= prefs.avatar %&gt;'</span><span class="nt">&gt;</span>
 </pre></div>
