@@ -1,1 +1,1 @@
-../test.js
+../tests/main.js

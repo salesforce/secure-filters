@@ -161,6 +161,39 @@ Or, you can namespace using a parametric style, similar to how EJS' pre-defined
   </script>
 ```
 
+## With Handlebars
+
+To configure [Handlebars.js](http://handlebarsjs.com/), simply wrap your
+`require('handlebars')` call.  This will import the filters as
+[Helpers](http://handlebarsjs.com/#helpers) using the names pre-defined by this
+module.
+
+```js
+  var handlebars = require('secure-filters').configureHandlebars(require('handlebars'));
+```
+
+Then, within a Handlebars template:
+
+```html
+  <script>
+    var config = {{jsObj config}};
+    var userId = parseInt("{{js userId}}",10);
+  </script>
+  <a href="/welcome/{{uri userId}}">
+   'Welcome {{userName}}</a> (userId {{userId}})
+  <br>
+  <a href="javascript:activate(\'{{jsAttr userId}}\')">
+   'Click here to activate {{html userName}}</a>
+```
+
+If you don't want the default `{{ }}` syntax to use secure-filter's
+`html(value)` function, pass `false` as a second parameter to
+`configureHandlebars()` (it's `true` by default).
+
+### Client-side Handlebars
+
+TODO: run on the `handlebars.runtime.js`?
+
 ## As Normal Functions
 
 The filter functions are just regular functions and can be used outside of EJS.
