@@ -1,12 +1,15 @@
 # secure-filters
 
-`secure-filters` is a collection of sanitization functions ("filters") to
-provide protection against [Cross-Site Scripting (XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29)
-and other injection attacks.
+`secure-filters` is a collection of Output Sanitization functions ("filters")
+to provide protection against [Cross-Site Scripting
+(XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29) and other
+injection attacks.
 
 [![Build Status](https://travis-ci.org/goinstant/secure-filters.png?branch=master)](https://travis-ci.org/goinstant/secure-filters)
 
-Table of select contents:
+![Data Flow Diagram](./images/secure-filters%20data%20flow.png)
+
+### Table of select contents
 
 - [About XSS](#about-xss)
 - [Usage](#usage)
@@ -35,16 +38,21 @@ applications](https://www.owasp.org/index.php/Top_10_2013-A3-Cross-Site_Scriptin
 for 2013, as determined by a broad consensus among
 [OWASP](https://www.owasp.org) members.
 
-To effectively combat XSS, you must combine input validation with output
-sanitization.  **Using one or the other is not sufficient; you must apply
-both!** This module aims to provide only output sanitization since there are
-plenty of JavaScript modules out there to do the validation part.
+To effectively combat XSS, you must combine Input Validation with Output
+Sanitization.  **Using one or the other is not sufficient; you must apply
+both!**.
 
-Whichever input validation and output sanitization modules you end up using,
-please review the code carefully and apply your own professional paranoia.
-Trust, but verify.
+The generally accepted flow in preventing XSS looks like this:
+
+![Data Flow Diagram](./images/secure-filters%20data%20flow.png)
+
+Whichever Input Validation and Output Sanitization modules you end up
+using, please review the code carefully and apply your own professional
+paranoia. Trust, but verify.
 
 ### Input Validation
+
+`secure-filters` doesn't deal with Input Validation, only Ouput Sanitization.
 
 You can roll your own input validation or you can use an existing module.
 Either way, there are
@@ -65,6 +73,34 @@ filters](https://github.com/chriso/node-validator#list-of-sanitization--filter-m
 Validator also has a 3rd party
 [express-validate](https://github.com/Dream-Web/express-validate) middleware
 module for use in the popular [Express](http://expressjs.com/) node.js server.
+
+### Output Sanitization
+
+Output Sanitization (also known as Ouput Filtering) is what `secure-filters` is
+responsible for.
+
+In order to properly santize output you need to be sensitive to the _context_
+in which the data is being output. For example, if you want to place text in an
+HTML document, you should HTML-escape the text.
+
+But what about CSS or JavaScript contexts? You can't use the HTML-escape
+filter; a different escaping method is necessary. If the filter doesn't match
+the context, it's possible for browsers to misinterpret the result, which can
+lead to XSS attacks!
+
+`secure-filters` aims to provide the filter functions necessary to do this type
+of context-sensitive sanitization.
+
+### Hybrid Sanitization
+
+"Sanitization" is an overloaded term and can be confused with other security
+techniques.
+
+For example, if you need to store and sanitize HTML, you'd want to parse,
+validate and sanitize that HTML in one hybridized step.  There are tools like
+[Google Caja](http://code.google.com/p/google-caja/) to do HTML sanitization.
+The [`sanitizer` module](https://github.com/theSmaw/Caja-HTML-Sanitizer)
+packages-up Caja for node.js/CommonJS usage.
 
 # Usage
 
