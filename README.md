@@ -115,6 +115,10 @@ filters _may not provide adequate protection_! Some browsers can treat some
 characters at Unicode code-points `0x00A0` and above as if they were `<` if the
 encoding is not set to UTF-8!
 
+## General Usage
+
+[![Cheat Sheet](./images/secure-filters%20cheat%20sheet.png)](./images/secure-filters%20cheat%20sheet.png)
+
 ## With EJS
 
 To configure EJS, simply wrap your `require('ejs')` call.  This will import the
@@ -135,6 +139,8 @@ Then, within an EJS template:
   <br>
   <a href="javascript:activate('<%-: userId |jsAttr%>')">Click here to activate</a>
 ```
+
+There's a handy [cheat sheet](./cheatsheet.md) showing all the filters in EJS syntax.
 
 ### Alternative EJS uses.
 
