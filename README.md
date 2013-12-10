@@ -40,7 +40,7 @@ for 2013, as determined by a broad consensus among
 
 To effectively combat XSS, you must combine Input Validation with Output
 Sanitization.  **Using one or the other is not sufficient; you must apply
-both!**.
+both!**
 
 The generally accepted flow in preventing XSS looks like this:
 
@@ -64,13 +64,10 @@ Either way, there are
 thread](http://stackoverflow.com/questions/4088723/validation-library-for-node-js)
 lists several input validation options specific to node.js.
 
-One of those options is node-validator ([NPM](https://npmjs.org/package/validator),
-[github](https://github.com/chriso/node-validator)).
-It provides an impressive list of chainable validators. In addition to
-validation, it gives a set of handy [sanitization
-filters](https://github.com/chriso/node-validator#list-of-sanitization--filter-methods).
-
-Validator also has a 3rd party
+One of those options is node-validator
+([NPM](https://npmjs.org/package/validator),
+[github](https://github.com/chriso/node-validator)).  It provides an impressive
+list of chainable validators.  Validator also has a 3rd party
 [express-validate](https://github.com/Dream-Web/express-validate) middleware
 module for use in the popular [Express](http://expressjs.com/) node.js server.
 
