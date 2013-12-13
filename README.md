@@ -40,7 +40,8 @@ for 2013, as determined by a broad consensus among
 
 To effectively combat XSS, you must combine Input Validation with Output
 Sanitization.  **Using one or the other is not sufficient; you must apply
-both!**
+both!**  Also, simple validations like string length aren't as effective; it's
+much safer to use _whitelist-based validation_.
 
 The generally accepted flow in preventing XSS looks like this:
 
@@ -70,6 +71,11 @@ One of those options is node-validator
 list of chainable validators.  Validator also has a 3rd party
 [express-validate](https://github.com/Dream-Web/express-validate) middleware
 module for use in the popular [Express](http://expressjs.com/) node.js server.
+
+Input Validation can be specialized to the data format.  For example, the
+jsonschema module ([NPM](https://npmjs.org/package/jsonschema),
+[github](https://github.com/tdegrunt/jsonschema)) can be useful for providing
+strict validation of JSON documents (e.g. bodies in HTTP).
 
 ### Output Sanitization
 
@@ -400,7 +406,7 @@ the [`style(value)`](#stylevalue) filter instead!
 
 :warning: **CAUTION** even though this module prevents breaking out of CSS
 context, it is still somewhat risky to allow user-controlled input into CSS and
-`<style>` blocks. Be sure to combine CSS escaping with whitelist-based input
+`<style>` blocks. Be sure to combine CSS escaping with _whitelist-based_ input
 sanitization! Here's a small sampling of what's possible:
 
 - https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability
@@ -433,7 +439,7 @@ Encodes values for safe embedding in HTML style attribute context.
 
 :warning: **CAUTION** even though this module prevents breaking out of style-attribute
 context, it is still somewhat risky to allow user-controlled input (see caveats
-on [css](#cssvalue) above).  Be sure to combine with whitelist-based input
+on [css](#cssvalue) above).  Be sure to combine with _whitelist-based_ input
 sanitization!
 
 Encodes the value first as in the `css()` filter, then HTML entity-encodes the result.
