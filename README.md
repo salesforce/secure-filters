@@ -1,12 +1,15 @@
 # secure-filters
 
-`secure-filters` is a collection of sanitization functions ("filters") to
-provide protection against [Cross-Site Scripting (XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29)
-and other injection attacks.
+`secure-filters` is a collection of Output Sanitization functions ("filters")
+to provide protection against [Cross-Site Scripting
+(XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29) and other
+injection attacks.
 
 [![Build Status](https://travis-ci.org/goinstant/secure-filters.png?branch=master)](https://travis-ci.org/goinstant/secure-filters)
 
-Table of select contents:
+![Data Flow Diagram](./images/secure-filters%20data%20flow.png)
+
+### Table of select contents
 
 - [About XSS](#about-xss)
 - [Usage](#usage)
@@ -35,16 +38,22 @@ applications](https://www.owasp.org/index.php/Top_10_2013-A3-Cross-Site_Scriptin
 for 2013, as determined by a broad consensus among
 [OWASP](https://www.owasp.org) members.
 
-To effectively combat XSS, you must combine input validation with output
-sanitization.  **Using one or the other is not sufficient; you must apply
-both!** This module aims to provide only output sanitization since there are
-plenty of JavaScript modules out there to do the validation part.
+To effectively combat XSS, you must combine Input Validation with Output
+Sanitization.  **Using one or the other is not sufficient; you must apply
+both!**  Also, simple validations like string length aren't as effective; it's
+much safer to use _whitelist-based validation_.
 
-Whichever input validation and output sanitization modules you end up using,
-please review the code carefully and apply your own professional paranoia.
-Trust, but verify.
+The generally accepted flow in preventing XSS looks like this:
+
+![Data Flow Diagram](./images/secure-filters%20data%20flow.png)
+
+Whichever Input Validation and Output Sanitization modules you end up
+using, please review the code carefully and apply your own professional
+paranoia. Trust, but verify.
 
 ### Input Validation
+
+`secure-filters` doesn't deal with Input Validation, only Ouput Sanitization.
 
 You can roll your own input validation or you can use an existing module.
 Either way, there are
@@ -56,19 +65,45 @@ Either way, there are
 thread](http://stackoverflow.com/questions/4088723/validation-library-for-node-js)
 lists several input validation options specific to node.js.
 
-One of those options is node-validator ([NPM](https://npmjs.org/package/validator),
-[github](https://github.com/chriso/node-validator)).
-It provides an impressive list of chainable validators. In addition to
-validation, it gives a set of handy [sanitization
-filters](https://github.com/chriso/node-validator#list-of-sanitization--filter-methods).
-
-Validator has an `xss()` filter function that can strip-out certain _common_ XSS
-attack-strings. But, _use caution_: XSS attacks can be so highly obfuscated that
-they may be able to [bypass Validator's detection
-algorithm](https://nealpoole.com/blog/2013/07/xss-filter-bypass-in-validator-nodejs-module/).
-Validator also has a 3rd party
+One of those options is node-validator
+([NPM](https://npmjs.org/package/validator),
+[github](https://github.com/chriso/node-validator)).  It provides an impressive
+list of chainable validators.  Validator also has a 3rd party
 [express-validate](https://github.com/Dream-Web/express-validate) middleware
 module for use in the popular [Express](http://expressjs.com/) node.js server.
+
+Input Validation can be specialized to the data format.  For example, the
+jsonschema module ([NPM](https://npmjs.org/package/jsonschema),
+[github](https://github.com/tdegrunt/jsonschema)) can be useful for providing
+strict validation of JSON documents (e.g. bodies in HTTP).
+
+### Output Sanitization
+
+Output Sanitization (also known as Ouput Filtering) is what `secure-filters` is
+responsible for.
+
+In order to properly santize output you need to be sensitive to the _context_
+in which the data is being output. For example, if you want to place text in an
+HTML document, you should HTML-escape the text.
+
+But what about CSS or JavaScript contexts? You can't use the HTML-escape
+filter; a different escaping method is necessary. If the filter doesn't match
+the context, it's possible for browsers to misinterpret the result, which can
+lead to XSS attacks!
+
+`secure-filters` aims to provide the filter functions necessary to do this type
+of context-sensitive sanitization.
+
+### Hybrid Sanitization
+
+"Sanitization" is an overloaded term and can be confused with other security
+techniques.
+
+For example, if you need to store and sanitize HTML, you'd want to parse,
+validate and sanitize that HTML in one hybridized step.  There are tools like
+[Google Caja](http://code.google.com/p/google-caja/) to do HTML sanitization.
+The [`sanitizer` module](https://github.com/theSmaw/Caja-HTML-Sanitizer)
+packages-up Caja for node.js/CommonJS usage.
 
 # Usage
 
@@ -85,6 +120,10 @@ the `<meta charset="">` tag (or eqivalent) specifies a non-UTF-8 encoding these
 filters _may not provide adequate protection_! Some browsers can treat some
 characters at Unicode code-points `0x00A0` and above as if they were `<` if the
 encoding is not set to UTF-8!
+
+## General Usage
+
+[![Cheat Sheet](./images/secure-filters%20cheat%20sheet.png)](./images/secure-filters%20cheat%20sheet.png)
 
 ## With EJS
 
@@ -106,6 +145,8 @@ Then, within an EJS template:
   <br>
   <a href="javascript:activate('<%-: userId |jsAttr%>')">Click here to activate</a>
 ```
+
+There's a handy [cheat sheet](./cheatsheet.md) showing all the filters in EJS syntax.
 
 ### Alternative EJS uses.
 
@@ -365,7 +406,7 @@ the [`style(value)`](#stylevalue) filter instead!
 
 :warning: **CAUTION** even though this module prevents breaking out of CSS
 context, it is still somewhat risky to allow user-controlled input into CSS and
-`<style>` blocks. Be sure to combine CSS escaping with whitelist-based input
+`<style>` blocks. Be sure to combine CSS escaping with _whitelist-based_ input
 sanitization! Here's a small sampling of what's possible:
 
 - https://www.computerworld.com/s/article/9221043/Opera_denies_refusing_to_patch_critical_vulnerability
@@ -398,7 +439,7 @@ Encodes values for safe embedding in HTML style attribute context.
 
 :warning: **CAUTION** even though this module prevents breaking out of style-attribute
 context, it is still somewhat risky to allow user-controlled input (see caveats
-on [css](#cssvalue) above).  Be sure to combine with whitelist-based input
+on [css](#cssvalue) above).  Be sure to combine with _whitelist-based_ input
 sanitization!
 
 Encodes the value first as in the `css()` filter, then HTML entity-encodes the result.
