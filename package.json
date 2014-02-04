@@ -4,7 +4,7 @@
   "description": "Anti-XSS filters for security",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test.js && mocha-phantomjs -R dot static/test.html",
+    "test": "mocha tests && mocha-phantomjs -R dot static/test.html",
     "blanket": {
       "pattern": "secure-filters.js"
     }
@@ -31,6 +31,7 @@
     "component": "0.18.0",
     "coveralls": "2.3.0",
     "mocha-lcov-reporter": "0.0.1",
-    "blanket": "1.1.5"
+    "blanket": "1.1.5",
+    "handlebars": "~1.1.2"
   }
 }
