@@ -325,23 +325,30 @@ Sanitizes output for a JavaScript literal in an HTML script context.
 ```
 
 This function encodes the object with `JSON.stringify()`, then
-escapes certain characters.  Any character not matched by
-`/[",\-\.0-9:A-Z\[\\\]_a-z{}]/` is escaped consistent with the
-[`js(value)`](#jsvalue) escaping above. Additionally, the sub-string `]]>` is
-encoded as `\x5D\x5D\x3E` to prevent breaking out of CDATA context.
+escapes all disallowed characters within strings.  Allowed characters are those matched by the regexp
+`/[,\-\.0-9A-Z_a-z]/`, i.e., alphanum plus `,-._`;
 
-Because `<` and `>` are not matched characters, they get encoded as `\x3C` and
-`\x3E`, respectively. This prevents breaking out of a surrounding HTML
-`<script>` context.
+For example, with a literal object like
 
-For example, with a literal object like `{username:'Albert
-</script><script>alert("Pwnerton")'}`, `jsObj()` gives output:
+```json
+{
+  'username!': 'Albert </script><script>alert("Pwnerton")'
+}
+```
+
+the `jsObj()` filter gives output:
 
 ```html
   <script>
-    var config = {"username":"\x3C\x2Fscript\x3E\x3Cscript\x3Ealert\x28\"Pwnerton\"\x29"};
+    var config = {"username\x21":"\x3C\x2Fscript\x3E\x3Cscript\x3Ealert\x28\x22Pwnerton\x22\x29"};
   </script>
 ```
+
+#### Changes
+
+In 1.0.x releases, the following characters were not escaped when contained in
+a string: `'",-.:[\]_{}`.  The sub-string `]]>`, however, was encoded as
+`\x5D\x5D\x3E` to prevent breaking out of CDATA context.
 
 #### JSON is not a subset of JavaScript
 
