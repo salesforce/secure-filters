@@ -374,9 +374,8 @@ combination of backslash- and entity-encoding.
   <button onclick="display('USERINPUT')">Click To Display</button>
 ```
 
-The string `<ha>, 'ha', "ha"` is escaped to `&lt;ha&gt;, \&#39;ha\&#39;,
-\&quot;ha\&quot;`. Note the backslashes before the apostrophe and quote
-entities.
+The string `<ha>, 'ha', "ha"` is escaped to
+`&#92;x3Cha&#92;x3E,&#92;x20&#92;x27ha&#92;x27,&#92;x20&#92;x22ha&#92;x22`.
 
 ### uri(value)
 
@@ -437,8 +436,6 @@ For example, the string `<wow>` becomes `\3c wow\3e ` (note the trailing space).
 ### style(value)
 
 Encodes values for safe embedding in HTML style attribute context.
-
-**USAGE**: all instances of `USERINPUT` should be sanitized by this function
 
 ```html
   <div style="background-color: #USERINPUT;"></div>
