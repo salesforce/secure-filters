@@ -83,6 +83,7 @@ var ALL_CASES = [
     html: '&#33;&quot;&#35;&#36;&#37;&amp;&#39;&#40;&#41;&#42;&#43;,-.&#47;&#58;&#59;&lt;&#61;&gt;&#63;&#64;&#91;&#92;&#93;&#94;_&#96;&#x7B;&#x7C;&#x7D;&#x7E;',
     js: '\\x21\\x22\\x23\\x24\\x25\\x26\\x27\\x28\\x29\\x2A\\x2B,-.\\x2F\\x3A\\x3B\\x3C\\x3D\\x3E\\x3F\\x40\\x5B\\x5C\\x5D\\x5E_\\x60\\x7B\\x7C\\x7D\\x7E',
     jsAttr: '&#92;x21&#92;x22&#92;x23&#92;x24&#92;x25&#92;x26&#92;x27&#92;x28&#92;x29&#92;x2A&#92;x2B,-.&#92;x2F&#92;x3A&#92;x3B&#92;x3C&#92;x3D&#92;x3E&#92;x3F&#92;x40&#92;x5B&#92;x5C&#92;x5D&#92;x5E_&#92;x60&#92;x7B&#92;x7C&#92;x7D&#92;x7E',
+    jsObj: '"\\x21\\x22\\x23\\x24\\x25\\x26\\x27\\x28\\x29\\x2A\\x2B,-.\\x2F\\x3A\\x3B\\x3C\\x3D\\x3E\\x3F\\x40\\x5B\\x5C\\x5D\\x5E_\\x60\\x7B\\x7C\\x7D\\x7E"', // identical to js, but surrounded by ""
     uri: '%21%22%23%24%25%26%27%28%29%2A%2B%2C-.%2F%3A%3B%3C%3D%3E%3F%40%5B%5C%5D%5E_%60%7B%7C%7D%7E',
     css: '\\21 \\22 \\23 \\24 \\25 \\26 \\27 \\28 \\29 \\2a \\2b \\2c \\2d \\2e \\2f \\3a \\3b \\3c \\3d \\3e \\3f \\40 \\5b \\5c \\5d \\5e \\5f \\60 \\7b \\7c \\7d \\7e ',
     style: '&#92;21 &#92;22 &#92;23 &#92;24 &#92;25 &#92;26 &#92;27 &#92;28 &#92;29 &#92;2a &#92;2b &#92;2c &#92;2d &#92;2e &#92;2f &#92;3a &#92;3b &#92;3c &#92;3d &#92;3e &#92;3f &#92;40 &#92;5b &#92;5c &#92;5d &#92;5e &#92;5f &#92;60 &#92;7b &#92;7c &#92;7d &#92;7e '
@@ -183,6 +184,7 @@ var ALL_CASES = [
     html: '&lt;&#33;&#91;CDATA&#91; blah &#93;&#93;&gt;',
     js: '\\x3C\\x21\\x5BCDATA\\x5B\\x20blah\\x20\\x5D\\x5D\\x3E',
     jsAttr: '&#92;x3C&#92;x21&#92;x5BCDATA&#92;x5B&#92;x20blah&#92;x20&#92;x5D&#92;x5D&#92;x3E',
+    jsObj: '"\\x3C\\x21\\x5BCDATA\\x5B\\x20blah\\x20\\x5D\\x5D\\x3E"',
     uri: '%3C%21%5BCDATA%5B%20blah%20%5D%5D%3E',
     css: '\\3c \\21 \\5b CDATA\\5b \\20 blah\\20 \\5d \\5d \\3e ',
     style: '&#92;3c &#92;21 &#92;5b CDATA&#92;5b &#92;20 blah&#92;20 &#92;5d &#92;5d &#92;3e '
@@ -245,12 +247,12 @@ var ALL_CASES = [
   {
     label: 'object literal',
     input: {key:"</script><script>alert(\"hah!\")"},
-    jsObj: '{"key":"\\x3C\\x2Fscript\\x3E\\x3Cscript\\x3Ealert\\x28\\"hah\\x21\\"\\x29"}'
+    jsObj: '{"key":"\\x3C\\x2Fscript\\x3E\\x3Cscript\\x3Ealert\\x28\\x22hah\\x21\\x22\\x29"}'
   },
   {
     label: 'object literal w/ unicode',
-    input: {key:"snowman:"+SNOWMAN},
-    jsObj: '{"key":"snowman:\\u2603"}'
+    input: {snowman:">>"+SNOWMAN+"<<", nomouth:">>"+FACE_WITHOUT_MOUTH+"<<"},
+    jsObj: '{"snowman":"\\x3E\\x3E\\u2603\\x3C\\x3C","nomouth":"\\x3E\\x3E\\uD83D\\uDE36\\x3C\\x3C"}'
   },
   {
     label: 'object w/ LINE SEPARATOR U+2028 and PARAGRAPH SEPARATOR U+2029',
@@ -260,17 +262,52 @@ var ALL_CASES = [
   {
     label: 'array literal',
     input: [1,2.3,"ouch",'</script><script>alert(\"hah!\")'],
-    jsObj: '[1,2.3,"ouch","\\x3C\\x2Fscript\\x3E\\x3Cscript\\x3Ealert\\x28\\"hah\\x21\\"\\x29"]'
+    jsObj: '[1,2.3,"ouch","\\x3C\\x2Fscript\\x3E\\x3Cscript\\x3Ealert\\x28\\x22hah\\x21\\x22\\x29"]'
   },
   {
     label: 'CDATA in object',
     input: {"open":"<![CDATA[", "close": "]]>"},
-    jsObj: '{"open":"\\x3C\\x21[CDATA[","close":"\\x5D\\x5D\\x3E"}'
+    jsObj: '{"open":"\\x3C\\x21\\x5BCDATA\\x5B","close":"\\x5D\\x5D\\x3E"}'
   },
   {
     label: "nested array doesn't trigger CDATA protection",
     input: [[['a']],['b']],
     jsObj: '[[["a"]],["b"]]'
+  },
+  {
+    label: 'Bad chars in object keys',
+    input: { "!": "/", "nest": { "!": "/", "nest2": { "!": "/" } } },
+    jsObj: '{"\\x21":"\\x2F","nest":{"\\x21":"\\x2F","nest2":{"\\x21":"\\x2F"}}}'
+  },
+  {
+    label: 'Bad chars in object keys, nested array',
+    input: { "!": "/", "arr": [ "?", { "!":"/", "?":['ok'] } ] },
+    jsObj: '{"\\x21":"\\x2F","arr":["\\x3F",{"\\x21":"\\x2F","\\x3F":["ok"]}]}'
+  },
+  {
+    label: 'Bad chars in array values',
+    input: [ "!", { "!": "!" } ],
+    jsObj: '["\\x21",{"\\x21":"\\x21"}]'
+  },
+  {
+    label: 'Bad chars in object keys, toJSON override returns string',
+    input: { "nest": { "<>": "<>", toJSON: function() { return "!"; } } },
+    jsObj: '{"nest":"\\x21"}'
+  },
+  {
+    label: 'Bad chars in object keys, toJSON override returns array',
+    input: { "nest": { "<>": "<>", toJSON: function() { return ["!"]; } } },
+    jsObj: '{"nest":["\\x21"]}'
+  },
+  {
+    label: 'Bad chars in object keys, toJSON override returns object',
+    input: { "nest": { toJSON: function() { return {"!":"!"}; } } },
+    jsObj: '{"nest":{"\\x21":"\\x21"}}'
+  },
+  {
+    label: 'Bad chars in array, toJSON override returns object',
+    input: ['?', { toJSON: function() { return {"!":"!"}; } } ],
+    jsObj: '["\\x3F",{"\\x21":"\\x21"}]'
   }
 ];
 
