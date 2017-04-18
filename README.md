@@ -22,6 +22,7 @@ injection attacks.
   - [`js(value)`](#jsvalue) - Sanitizes JavaScript string contexts using backslash-encoding.
   - [`jsObj(value)`](#jsobjvalue) - Sanitizes JavaScript literals (numbers, strings,
     booleans, arrays, and objects) for inclusion in an HTML script context.
+  - [`json(value)`](#jsonvalue) - Sanitized already-serialized JSON strings for HTML script contexts.
   - [`jsAttr(value)`](#jsattrvalue) - Sanitizes JavaScript string contexts _in an HTML attribute_
     using a combination of entity- and backslash-encoding.
   - [`uri(value)`](#urivalue) - Sanitizes URI contexts using percent-encoding.
@@ -353,7 +354,7 @@ Sanitizes output for a JavaScript literal in an HTML script context.
 ```
 
 This function encodes the object with `JSON.stringify()`, then
-escapes using `json()` detailed above.
+escapes using [`json(value)`](#jsonvalue) detailed above.
 
 For example, with a literal object like `{username:'Albert
 </script><script>alert("Pwnerton")'}`, `jsObj()` gives output:
