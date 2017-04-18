@@ -314,6 +314,34 @@ Any character not matched by `/[,\-\.0-9A-Z_a-z]/` is escaped as `\xHH` or
 `\uHHHH` where `H` is a hexidecimal digit.  The shorter `\x` form is used for
 charaters in the 7-bit ASCII range (i.e. code point <= 0x7F).
 
+### json(value)
+
+Sanitizes output for a JSON string in an HTML script context.
+
+```html
+  <script>
+    var config = USERINPUT;
+  </script>
+```
+
+This function escapes certain characters within a JSON string.  Any character
+not matched by `/[",\-\.0-9:A-Z\[\\\]_a-z{}]/` is escaped consistent with the
+[`js(value)`](#jsvalue) escaping above. Additionally, the sub-string `]]>` is
+encoded as `\x5D\x5D\x3E` to prevent breaking out of CDATA context.
+
+Because `<` and `>` are not matched characters, they get encoded as `\x3C` and
+`\x3E`, respectively. This prevents breaking out of a surrounding HTML
+`<script>` context.
+
+For example, with a JSON string like `'{"username":"Albert </script><script>alert(\"Pwnerton\")"}'`,
+`json()` gives output:
+
+```html
+  <script>
+    var config = {"username":"\x3C\x2Fscript\x3E\x3Cscript\x3Ealert\x28\"Pwnerton\"\x29"};
+  </script>
+```
+
 ### jsObj(value)
 
 Sanitizes output for a JavaScript literal in an HTML script context.
@@ -325,14 +353,7 @@ Sanitizes output for a JavaScript literal in an HTML script context.
 ```
 
 This function encodes the object with `JSON.stringify()`, then
-escapes certain characters.  Any character not matched by
-`/[",\-\.0-9:A-Z\[\\\]_a-z{}]/` is escaped consistent with the
-[`js(value)`](#jsvalue) escaping above. Additionally, the sub-string `]]>` is
-encoded as `\x5D\x5D\x3E` to prevent breaking out of CDATA context.
-
-Because `<` and `>` are not matched characters, they get encoded as `\x3C` and
-`\x3E`, respectively. This prevents breaking out of a surrounding HTML
-`<script>` context.
+escapes using `json()` detailed above.
 
 For example, with a literal object like `{username:'Albert
 </script><script>alert("Pwnerton")'}`, `jsObj()` gives output:
