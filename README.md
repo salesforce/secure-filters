@@ -5,7 +5,7 @@ to provide protection against [Cross-Site Scripting
 (XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29) and other
 injection attacks.
 
-[![Build Status](https://travis-ci.org/goinstant/secure-filters.png?branch=master)](https://travis-ci.org/goinstant/secure-filters)
+[![Build Status](https://travis-ci.org/salesforce/secure-filters.png?branch=master)](https://travis-ci.org/salesforce/secure-filters)
 
 ![Data Flow Diagram](./images/secure-filters%20data%20flow.png)
 
@@ -58,8 +58,8 @@ paranoia. Trust, but verify.
 You can roll your own input validation or you can use an existing module.
 Either way, there are
 [many](https://owasp.org/index.php/Data_Validation)
-[important](https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security)
-[rules](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet) to follow.
+[important](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet)
+rules to follow.
 
 [This Stack-Overflow
 thread](http://stackoverflow.com/questions/4088723/validation-library-for-node-js)
@@ -469,59 +469,38 @@ For example, the string `<wow>` becomes `&#92;3c wow&#92;3e `.
 
 # Contributing
 
-If you'd like to contribute to or modify secure-filters, here's a quick guide
-to get you started.
-
-## Development Dependencies
-
-- [node.js](http://nodejs.org) >= 0.10
-
-## Set-Up
-
-Download via GitHub and install npm dependencies:
-
-```sh
-git clone git@github.com:goinstant/secure-filters.git
-cd secure-filters
-
-npm install
-```
-
-## Testing
-
-Testing is with the [mocha](https://github.com/visionmedia/mocha) framework.
-Tests are located in the `tests/` directory.
-
-The unit tests are run twice: once under node.js and once under
-[PhantomJS](http://phantomjs.org/). PhantomJS test files are located in the
-`static/` directory.
-
-To run the tests:
-
-```sh
-npm test
-```
-
-## Publishing
-
-1. `npm version patch` (increments `x` in `z.y.x`, then makes a commit for package.json, tags that commit)
-2. `git push --tags origin master`
-3. `npm publish`
-
-Go to https://npmjs.org/package/secure-filters and verify it published (can take several minutes)
+Please see the [Contribution Guide](./contributing.md).
 
 # Support
 
-Email [GoInstant Support](mailto:support@goinstant.com) or stop by [#goinstant on freenode](irc://irc.freenode.net#goinstant).
+Support is provided via [github issues](https://github.com/salesforce/secure-filters/issues).
 
-For responsible disclosures, email [GoInstant Security](mailto:security@goinstant.com).
+For responsible disclosures, email [Salesforce Security](mailto:security@salesforce.com).
 
-To [file a bug](https://github.com/goinstant/secure-filters/issues) or
-[propose a patch](https://github.com/goinstant/secure-filters/pulls),
-please use github directly.
+# Changelog
+
+#### 1.1.0
+
+This release changes the behavior of secure-filters, but should be
+backwards-compatible with 1.0.5.
+
+- The `js`, `jsObj` and `jsAttr` filter now use a strict allow-list for
+  characters in strings.  This is safer, but does increase the size of these
+  strings slightly.  Compliant JSON and JavaScript parsers will not be affected
+  negatively by this change.
+- The example for `jsAttr` was incorrect.  It previously stated that `<ha>,
+  'ha', "ha"` was escaped to `&lt;ha&gt;, \&#39;ha\&#39;, \&quot;ha\&quot;`
+
+#### 1.0.5
+
+- Vastly improved documentation and illustrations
+
+#### 1.0.4
+
+- Initial public release
 
 # Legal
 
-&copy; 2013 GoInstant Inc., a salesforce.com company
+&copy; 2014 salesforce.com
 
 Licensed under the BSD 3-clause license.
