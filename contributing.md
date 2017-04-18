@@ -12,7 +12,7 @@ to get you started.
 Download via GitHub and install npm dependencies:
 
 ```sh
-git clone git@github.com:goinstant/secure-filters.git
+git clone git@github.com:salesforce/secure-filters.git
 cd secure-filters
 
 npm install

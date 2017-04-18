@@ -6,8 +6,8 @@
   "scripts": {
     "test": "`npm bin`/mocha test.js && `npm bin`/mocha-phantomjs -R dot static/test.html"
   },
-  "homepage": "http://goinstant.github.io/secure-filters/",
-  "repository": "git@github.com:goinstant/secure-filters.git",
+  "homepage": "http://salesforce.github.io/secure-filters/",
+  "repository": "git@github.com:salesforce/secure-filters.git",
   "author": "Salesforce.com, Inc.",
   "license": "BSD-3-Clause",
   "engines": {

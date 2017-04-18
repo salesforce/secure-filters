@@ -5,7 +5,7 @@ to provide protection against [Cross-Site Scripting
 (XSS)](https://owasp.org/index.php/Cross-site_Scripting_%28XSS%29) and other
 injection attacks.
 
-[![Build Status](https://travis-ci.org/goinstant/secure-filters.png?branch=master)](https://travis-ci.org/goinstant/secure-filters)
+[![Build Status](https://travis-ci.org/salesforce/secure-filters.png?branch=master)](https://travis-ci.org/salesforce/secure-filters)
 
 ![Data Flow Diagram](./images/secure-filters%20data%20flow.png)
 
@@ -58,8 +58,8 @@ paranoia. Trust, but verify.
 You can roll your own input validation or you can use an existing module.
 Either way, there are
 [many](https://owasp.org/index.php/Data_Validation)
-[important](https://goinstant.com/blog/the-importance-of-proper-input-validation-for-security)
-[rules](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet) to follow.
+[important](https://owasp.org/index.php/XSS_%28Cross_Site_Scripting%29_Prevention_Cheat_Sheet)
+rules to follow.
 
 [This Stack-Overflow
 thread](http://stackoverflow.com/questions/4088723/validation-library-for-node-js)
@@ -473,7 +473,7 @@ Please see the [Contribution Guide](./contributing.md).
 
 # Support
 
-Support is provided via [github issues](https://github.com/goinstant/secure-filters/issues).
+Support is provided via [github issues](https://github.com/salesforce/secure-filters/issues).
 
 For responsible disclosures, email [Salesforce Security](mailto:security@salesforce.com).
 
