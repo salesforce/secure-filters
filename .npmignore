@@ -1,0 +1,8 @@
+*node_modules*
+.DS_Store
+npm-debug*
+.*.sw[mnop]
+components/
+# above this line should be all of .gitignore
+images/
+component.json
