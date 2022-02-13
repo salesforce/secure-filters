@@ -3,3 +3,5 @@
 npm-debug*
 .*.sw[mnop]
 components/
+bower_components/
+gh-pages/
